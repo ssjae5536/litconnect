@@ -1,0 +1,1895 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LitConnect</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Spotify Web Playback SDK - script.js보다 먼저 로드되어야 함 -->
+    <script src="https://sdk.scdn.co/spotify-player.js"></script>
+</head>
+<body>
+    <main>
+        <header>
+            <div class="header-top">
+                <h1>LitConnect</h1>
+                <div class="playlist-bar">
+                    <div class="playlist-info">
+                        <div class="now-playing">
+                            <span class="song-title">Classical Reading Playlist</span>
+                            <span class="artist-name">Various Artists</span>
+                        </div>
+                    </div>
+                    <div class="playlist-controls">
+                        <button type="button" class="prev-btn" id="prev-btn" aria-label="이전 곡">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M18 4v16h-2V4h2zm-10 0l-8 8 8 8V4z"/>
+                            </svg>
+                        </button>
+                        <button type="button" class="play-pause-btn" id="play-pause-btn" aria-label="재생/일시정지">
+                            <svg class="play-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M8 5v14l11-7z"/>
+                            </svg>
+                            <svg class="pause-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+                                <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+                            </svg>
+                        </button>
+                        <button type="button" class="next-btn" id="next-btn" aria-label="다음 곡">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M6 4l8 8-8 8V4zm10 0v16h2V4h-2z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#mypage" onclick="showPage('mypage-page'); return false;">마이페이지</a></li>
+                    <li><a href="#books" onclick="showPage('book-selection-page'); return false;">AI 뷰어</a></li>
+                    <li><a href="#playlist" onclick="showPage('playlist-page'); return false;">독서 플레이리스트</a></li>
+                    <li><a href="#community" onclick="showPage('community-page'); return false;">토론 커뮤니티</a></li>
+                    <li><a href="#map" onclick="showPage('map-page'); return false;">문학 기행 맵</a></li>
+                </ul>
+            </nav>
+        </header>
+        <div id="mypage-page">
+            <section class="features">
+                <article class="feature-card mypage-container">
+                    <div class="mypage-profile">
+                        <div class="profile-header">
+                            <div class="profile-avatar">
+                                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                            </div>
+                            <div class="profile-info">
+                                <h3 id="profile-nickname">독서인</h3>
+                                <p class="profile-email" id="profile-email">reader@litconnect.com</p>
+                                <p class="profile-bio" id="profile-bio"></p>
+                                <p class="profile-join-date">2024년 1월부터 활동 중</p>
+                            </div>
+                            <button type="button" class="profile-settings-btn" id="profile-settings-btn" aria-label="설정">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mypage-stats">
+                        <h4>독서 통계</h4>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-value">24</div>
+                                <div class="stat-label">읽은 책</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">3,456</div>
+                                <div class="stat-label">읽은 페이지</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">12</div>
+                                <div class="stat-label">독서 장소</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">156</div>
+                                <div class="stat-label">독서 시간(시간)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mypage-reading-list">
+                        <div class="section-header">
+                            <h4>현재 읽고 있는 책</h4>
+                            <button type="button" class="section-toggle-btn" aria-label="더보기">더보기</button>
+                        </div>
+                        <div class="reading-books-list">
+                            <div class="book-item">
+                                <div class="book-cover">
+                                    <svg width="48" height="64" viewBox="0 0 24 32" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M4 2h16v28H4V2z"></path>
+                                        <path d="M4 8h16"></path>
+                                    </svg>
+                                </div>
+                                <div class="book-info">
+                                    <h5 class="book-title">1984</h5>
+                                    <p class="book-author">George Orwell</p>
+                                    <div class="book-progress">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: 65%"></div>
+                                        </div>
+                                        <span class="progress-text">65% 완독</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="book-item">
+                                <div class="book-cover">
+                                    <svg width="48" height="64" viewBox="0 0 24 32" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M4 2h16v28H4V2z"></path>
+                                        <path d="M4 8h16"></path>
+                                    </svg>
+                                </div>
+                                <div class="book-info">
+                                    <h5 class="book-title">The Great Gatsby</h5>
+                                    <p class="book-author">F. Scott Fitzgerald</p>
+                                    <div class="book-progress">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: 30%"></div>
+                                        </div>
+                                        <span class="progress-text">30% 완독</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mypage-completed">
+                        <div class="section-header">
+                            <h4>완독한 책</h4>
+                            <button type="button" class="section-toggle-btn" aria-label="더보기">더보기</button>
+                        </div>
+                        <div class="completed-books-grid">
+                            <div class="completed-book-item">
+                                <div class="book-cover-small">
+                                    <svg width="40" height="52" viewBox="0 0 24 32" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M4 2h16v28H4V2z"></path>
+                                        <path d="M4 8h16"></path>
+                                    </svg>
+                                </div>
+                                <div class="completed-book-info">
+                                    <h6 class="completed-book-title">To Kill a Mockingbird</h6>
+                                    <p class="completed-book-author">Harper Lee</p>
+                                </div>
+                            </div>
+                            <div class="completed-book-item">
+                                <div class="book-cover-small">
+                                    <svg width="40" height="52" viewBox="0 0 24 32" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M4 2h16v28H4V2z"></path>
+                                        <path d="M4 8h16"></path>
+                                    </svg>
+                                </div>
+                                <div class="completed-book-info">
+                                    <h6 class="completed-book-title">Pride and Prejudice</h6>
+                                    <p class="completed-book-author">Jane Austen</p>
+                                </div>
+                            </div>
+                            <div class="completed-book-item">
+                                <div class="book-cover-small">
+                                    <svg width="40" height="52" viewBox="0 0 24 32" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M4 2h16v28H4V2z"></path>
+                                        <path d="M4 8h16"></path>
+                                    </svg>
+                                </div>
+                                <div class="completed-book-info">
+                                    <h6 class="completed-book-title">The Catcher in the Rye</h6>
+                                    <p class="completed-book-author">J.D. Salinger</p>
+                                </div>
+                            </div>
+                            <div class="completed-book-item">
+                                <div class="book-cover-small">
+                                    <svg width="40" height="52" viewBox="0 0 24 32" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M4 2h16v28H4V2z"></path>
+                                        <path d="M4 8h16"></path>
+                                    </svg>
+                                </div>
+                                <div class="completed-book-info">
+                                    <h6 class="completed-book-title">Animal Farm</h6>
+                                    <p class="completed-book-author">George Orwell</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mypage-places">
+                        <div class="section-header">
+                            <h4>독서한 장소 기록</h4>
+                            <button type="button" class="section-toggle-btn" aria-label="더보기">더보기</button>
+                        </div>
+                        <div class="reading-places-list">
+                            <div class="reading-place-item">
+                                <div class="place-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                        <circle cx="12" cy="10" r="3"></circle>
+                                    </svg>
+                                </div>
+                                <div class="place-details">
+                                    <h5 class="place-name">책과 나무</h5>
+                                    <p class="place-date">2024년 3월 15일</p>
+                                    <p class="place-book">1984 - George Orwell</p>
+                                </div>
+                            </div>
+                            <div class="reading-place-item">
+                                <div class="place-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                        <circle cx="12" cy="10" r="3"></circle>
+                                    </svg>
+                                </div>
+                                <div class="place-details">
+                                    <h5 class="place-name">문학의 정원</h5>
+                                    <p class="place-date">2024년 3월 10일</p>
+                                    <p class="place-book">The Great Gatsby - F. Scott Fitzgerald</p>
+                                </div>
+                            </div>
+                            <div class="reading-place-item">
+                                <div class="place-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                        <circle cx="12" cy="10" r="3"></circle>
+                                    </svg>
+                                </div>
+                                <div class="place-details">
+                                    <h5 class="place-name">커피와 책</h5>
+                                    <p class="place-date">2024년 3월 5일</p>
+                                    <p class="place-book">Pride and Prejudice - Jane Austen</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </section>
+        </div>
+
+        <div id="book-selection-page">
+            <section class="features">
+                <article class="feature-card book-selection-container">
+                    <div class="book-controls">
+                        <div class="book-search-wrapper">
+                            <input type="text" class="book-search-input" id="book-search-input" placeholder="책 제목, 작가 검색" aria-label="책 제목, 작가 검색">
+                            <svg class="book-search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <path d="m21 21-4.35-4.35"></path>
+                            </svg>
+                        </div>
+                        <select class="book-sort-select" id="book-sort-select" aria-label="정렬 기준 선택">
+                            <option value="name">이름순</option>
+                            <option value="recommended">추천순</option>
+                            <option value="weekday">주중 인기순</option>
+                            <option value="monthly">월간 인기순</option>
+                        </select>
+                    </div>
+                    <div class="books-grid" id="books-grid">
+                        <div class="book-card" data-book="1984" data-recommended="95" data-weekday-views="1240" data-monthly-views="5420">
+                            <div class="book-card-info">
+                                <h4 class="book-card-title">1984</h4>
+                                <p class="book-card-author">George Orwell</p>
+                                <p class="book-card-genre">Dystopian Fiction</p>
+                                <div class="book-card-buttons">
+                                    <button type="button" class="book-summary-btn" data-book="1984">줄거리</button>
+                                    <button type="button" class="book-select-btn" data-book="1984">보기</button>
+                                </div>
+                            </div>
+                            <div class="book-summary-popup" id="summary-popup-1984">
+                                <button type="button" class="summary-popup-close" aria-label="닫기">×</button>
+                                <div class="summary-popup-content">
+                                    <h4>1984</h4>
+                                    <p class="summary-author">George Orwell</p>
+                                    <div class="summary-text">
+                                        <p>빅 브라더가 감시하는 전체주의 사회에서 주인공 윈스턴이 자유와 진실을 찾아 저항하는 디스토피아 소설입니다. 감시와 통제가 일상이 된 세계에서 개인의 사상과 감정까지도 억압당하는 모습을 통해 권력의 폭정과 진실의 왜곡을 날카롭게 비판합니다.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="book-card" data-book="gatsby" data-recommended="88" data-weekday-views="980" data-monthly-views="4320">
+                            <div class="book-card-info">
+                                <h4 class="book-card-title">The Great Gatsby</h4>
+                                <p class="book-card-author">F. Scott Fitzgerald</p>
+                                <p class="book-card-genre">Classic Literature</p>
+                                <div class="book-card-buttons">
+                                    <button type="button" class="book-summary-btn" data-book="gatsby">줄거리</button>
+                                    <button type="button" class="book-select-btn" data-book="gatsby">보기</button>
+                                </div>
+                            </div>
+                            <div class="book-summary-popup" id="summary-popup-gatsby">
+                                <button type="button" class="summary-popup-close" aria-label="닫기">×</button>
+                                <div class="summary-popup-content">
+                                    <h4>The Great Gatsby</h4>
+                                    <p class="summary-author">F. Scott Fitzgerald</p>
+                                    <div class="summary-text">
+                                        <p>1920년대 재즈 시대를 배경으로, 신비로운 부자 제이 갯츠비와 데이지에 대한 사랑 이야기를 통해 미국 꿈의 허상을 그린 작품입니다. 부와 성공의 환상 속에서 진정한 행복을 찾지 못하는 인물들의 모습을 통해 물질주의와 사회적 위선을 비판합니다.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="book-card" data-book="pride" data-recommended="92" data-weekday-views="1120" data-monthly-views="4850">
+                            <div class="book-card-info">
+                                <h4 class="book-card-title">Pride and Prejudice</h4>
+                                <p class="book-card-author">Jane Austen</p>
+                                <p class="book-card-genre">Romance, Classic</p>
+                                <div class="book-card-buttons">
+                                    <button type="button" class="book-summary-btn" data-book="pride">줄거리</button>
+                                    <button type="button" class="book-select-btn" data-book="pride">보기</button>
+                                </div>
+                            </div>
+                            <div class="book-summary-popup" id="summary-popup-pride">
+                                <button type="button" class="summary-popup-close" aria-label="닫기">×</button>
+                                <div class="summary-popup-content">
+                                    <h4>Pride and Prejudice</h4>
+                                    <p class="summary-author">Jane Austen</p>
+                                    <div class="summary-text">
+                                        <p>오만한 다아시와 편견에 사로잡힌 엘리자베스의 만남을 통해 계급과 성별의 고정관념을 넘어선 진정한 사랑을 그린 로맨스 소설입니다. 19세기 영국 상류 사회의 결혼 관습과 사회적 제약 속에서도 자신의 가치관을 지키며 성장하는 여성의 모습을 그립니다.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="book-card" data-book="mockingbird" data-recommended="90" data-weekday-views="1050" data-monthly-views="4680">
+                            <div class="book-card-info">
+                                <h4 class="book-card-title">To Kill a Mockingbird</h4>
+                                <p class="book-card-author">Harper Lee</p>
+                                <p class="book-card-genre">Coming-of-Age</p>
+                                <div class="book-card-buttons">
+                                    <button type="button" class="book-summary-btn" data-book="mockingbird">줄거리</button>
+                                    <button type="button" class="book-select-btn" data-book="mockingbird">보기</button>
+                                </div>
+                            </div>
+                            <div class="book-summary-popup" id="summary-popup-mockingbird">
+                                <button type="button" class="summary-popup-close" aria-label="닫기">×</button>
+                                <div class="summary-popup-content">
+                                    <h4>To Kill a Mockingbird</h4>
+                                    <p class="summary-author">Harper Lee</p>
+                                    <div class="summary-text">
+                                        <p>1930년대 미국 남부를 배경으로, 어린 스카웃의 시선을 통해 인종 차별과 편견의 문제를 다룬 성장 소설입니다. 아버지 애티커스 핀치의 정의로운 모습을 통해 공정함과 용기의 가치를 배워가는 아이들의 성장 이야기를 담고 있습니다.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="book-card" data-book="catcher" data-recommended="85" data-weekday-views="890" data-monthly-views="3950">
+                            <div class="book-card-info">
+                                <h4 class="book-card-title">The Catcher in the Rye</h4>
+                                <p class="book-card-author">J.D. Salinger</p>
+                                <p class="book-card-genre">Literary Fiction</p>
+                                <div class="book-card-buttons">
+                                    <button type="button" class="book-summary-btn" data-book="catcher">줄거리</button>
+                                    <button type="button" class="book-select-btn" data-book="catcher">보기</button>
+                                </div>
+                            </div>
+                            <div class="book-summary-popup" id="summary-popup-catcher">
+                                <button type="button" class="summary-popup-close" aria-label="닫기">×</button>
+                                <div class="summary-popup-content">
+                                    <h4>The Catcher in the Rye</h4>
+                                    <p class="summary-author">J.D. Salinger</p>
+                                    <div class="summary-text">
+                                        <p>10대 소년 홀든 콜필드가 성인 세계의 위선과 거짓에 반항하며 자신만의 진실을 찾아가는 여정을 그린 작품입니다. 순수함을 잃어가는 것에 대한 두려움과 세상에 대한 불만을 솔직하게 표현하며, 청소년의 정체성 형성 과정을 섬세하게 묘사합니다.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="book-card" data-book="animal" data-recommended="87" data-weekday-views="950" data-monthly-views="4100">
+                            <div class="book-card-info">
+                                <h4 class="book-card-title">Animal Farm</h4>
+                                <p class="book-card-author">George Orwell</p>
+                                <p class="book-card-genre">Allegory, Satire</p>
+                                <div class="book-card-buttons">
+                                    <button type="button" class="book-summary-btn" data-book="animal">줄거리</button>
+                                    <button type="button" class="book-select-btn" data-book="animal">보기</button>
+                                </div>
+                            </div>
+                            <div class="book-summary-popup" id="summary-popup-animal">
+                                <button type="button" class="summary-popup-close" aria-label="닫기">×</button>
+                                <div class="summary-popup-content">
+                                    <h4>Animal Farm</h4>
+                                    <p class="summary-author">George Orwell</p>
+                                    <div class="summary-text">
+                                        <p>동물들이 인간을 몰아내고 이상적인 농장을 만들지만, 권력의 타락으로 다시 억압받게 되는 우화를 통해 혁명의 모순을 풍자한 작품입니다. 평등을 외치며 시작한 혁명이 결국 새로운 지배 계급을 만들어내는 과정을 통해 권력의 본질을 날카롭게 비판합니다.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </section>
+        </div>
+
+        <div id="ai-viewer-page">
+            <section class="features">
+                <article id="ai-viewer" class="feature-card">
+                    <h3>AI 뷰어</h3>
+                    <p>최신 AI 기술로 작품 속 표현과 주제를 분석하여 새로운 관점을 제공합니다.</p>
+                    <div class="reading-layout">
+                        <aside id="toc-panel" class="reading-panel toc-panel">
+                            <h4>목차</h4>
+                            <ol class="toc-list">
+                                <li><a href="#chapter-1">Chapter 1. The Clock Strikes</a></li>
+                                <li><a href="#chapter-2">Chapter 2. Ministry of Truth</a></li>
+                                <li><a href="#chapter-3">Chapter 3. Memory and Dreams</a></li>
+                                <li><a href="#chapter-4">Chapter 4. Resistance Notes</a></li>
+                            </ol>
+                        </aside>
+
+                        <section class="reading-panel viewer-panel">
+                            <h4>원서 텍스트</h4>
+                            <div class="level-toggle" role="tablist">
+                                <button type="button" class="level-btn active" data-level="beginner" aria-selected="true">Beginner</button>
+                                <button type="button" class="level-btn" data-level="intermediate" aria-selected="false">Intermediate</button>
+                                <button type="button" class="level-btn" data-level="advanced" aria-selected="false">Advanced</button>
+                            </div>
+                            <div id="viewer" class="viewer-content">
+                                <article class="viewer-level active" data-level="beginner">
+                                    <p class="viewer-text">The morning air felt crisp as Winston opened the window. Sunlight touched the pages of his worn diary, and the quiet street below seemed peaceful for a moment.</p>
+                                    <p class="viewer-text">He wrote simple sentences about the day, promising himself to stay hopeful. Even small words carried meaning when they were spoken with care.</p>
+                                </article>
+                                <article class="viewer-level" data-level="intermediate">
+                                    <p class="viewer-text">Winston paused, letting the cool spring breeze filter through the curtains while the distant chime of thirteen echoed from the clocktower. The sound was familiar yet unsettling, a persistent reminder that ordinary routines were shaped by unseen hands.</p>
+                                    <p class="viewer-text">He scribbled in his journal about fleeting moments of kindness he noticed in the city. Though subtle, each gesture hinted that quiet resistance might bloom in unexpected places.</p>
+                                </article>
+                                <article class="viewer-level" data-level="advanced">
+                                    <p class="viewer-text">Perched beside the narrow window, Winston contemplated the paradox of solitude within a crowded metropolis. The clocks’ aberrant toll, striking thirteen, resonated like a ciphered warning threaded through the fabric of a regimented society.</p>
+                                    <p class="viewer-text">In his journal he catalogued aberrations—the nuanced inflections in public speeches, the delicate rebellions disguised as courteous smiles. Each observation became an act of intellectual preservation against the gradual erosion of truth.</p>
+                                </article>
+                            </div>
+                            
+                            <!-- 번역 결과 표시 영역 -->
+                            <div id="translation-display" class="translation-display" style="display: none;">
+                                <h4>번역 결과</h4>
+                                <div class="translation-content">
+                                    <p class="translation-text"></p>
+                                </div>
+                            </div>
+                        </section>
+
+                        <aside id="learning-tools" class="reading-panel tools-panel">
+                            <h4>AI 학습 보조</h4>
+                            <div class="tools-tabs" role="tablist">
+                                <button type="button" class="tools-tab-btn active" data-tab="vocab" aria-selected="true">자동 단어장</button>
+                                <button type="button" class="tools-tab-btn" data-tab="summary" aria-selected="false">챕터별 요약</button>
+                                <button type="button" class="tools-tab-btn" data-tab="discussion" aria-selected="false">AI 토론 주제</button>
+                            </div>
+                            <section class="tools-content">
+                                <div class="tools-pane active" data-tab="vocab">
+                                    <p>단어장, 문법 분석, 발음 가이드가 실시간으로 제공됩니다.</p>
+                                    <button id="generate-vocab-btn" class="btn secondary-btn">단어장 불러오기</button>
+                                    <div id="vocab-list" class="ai-response vocab-list">단어장을 불러오려면 버튼을 눌러주세요.</div>
+                                </div>
+                                <div class="tools-pane" data-tab="summary">
+                                    <p class="tools-description">선택한 챕터에 대한 요약과 핵심 포인트를 제공합니다.</p>
+                                    <button id="summary-button" class="btn secondary-btn">챕터별 줄거리 요약</button>
+                                    <div id="summary-result" class="ai-response summary-result" style="display: none;"></div>
+                                    <div class="tools-placeholder" id="summary-placeholder">
+                                        <h5>예상 제공 정보</h5>
+                                        <ul>
+                                            <li>주요 사건과 전개 요약</li>
+                                            <li>등장 인물의 동기와 변화</li>
+                                            <li>테마와 상징 요소 정리</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="tools-pane" data-tab="discussion">
+                                    <p class="tools-description">AI가 생성한 토론 질문과 사고 확장 활동을 제공합니다.</p>
+                                    <button id="generate-topics-btn" class="btn secondary-btn">AI 토론 주제 제시</button>
+                                    <div id="topics-result" class="ai-response topics-result" style="display: none;"></div>
+                                    <div class="tools-placeholder" id="topics-placeholder">
+                                        <h5>예상 토론 주제</h5>
+                                        <ol>
+                                            <li>등장인물이 직면한 윤리적 선택 분석</li>
+                                            <li>텍스트 속 사회 구조와 현재와의 비교</li>
+                                            <li>다른 결말을 상상해 보는 창의적 활동</li>
+                                        </ol>
+                                    </div>
+                                </div>
+                            </section>
+                        </aside>
+                    </div>
+                </article>
+            </section>
+        </div>
+
+        <div id="community-page">
+            <section class="features">
+                <article id="community" class="feature-card community-card">
+                    <header class="community-header">
+                        <div class="community-filters">
+                            <div class="filter-group">
+                                <span class="filter-group-label">주제:</span>
+                                <span class="filter-pill active" data-filter="all" data-filter-type="category">전체 주제</span>
+                                <span class="filter-pill" data-filter="문학 해석" data-filter-type="category">문학 해석</span>
+                                <span class="filter-pill" data-filter="사회 · 윤리" data-filter-type="category">사회 · 윤리</span>
+                                <span class="filter-pill" data-filter="창의적 글쓰기" data-filter-type="category">창의적 글쓰기</span>
+                                <span class="filter-pill" data-filter="언어 학습" data-filter-type="category">언어 학습</span>
+                                <span class="filter-pill" data-filter="작가 탐구" data-filter-type="category">작가 탐구</span>
+                                <span class="filter-pill" data-filter="사회 연계" data-filter-type="category">사회 연계</span>
+                            </div>
+                            <div class="filter-group">
+                                <span class="filter-group-label">레벨:</span>
+                                <span class="filter-pill active" data-filter="all" data-filter-type="level">전체 레벨</span>
+                                <span class="filter-pill" data-filter="beginner" data-filter-type="level">Beginner</span>
+                                <span class="filter-pill" data-filter="intermediate" data-filter-type="level">Intermediate</span>
+                                <span class="filter-pill" data-filter="advanced" data-filter-type="level">Advanced</span>
+                            </div>
+                        </div>
+                        <button type="button" class="create-community-btn" id="create-community-btn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            <span>새 커뮤니티 만들기</span>
+                        </button>
+                    </header>
+                    <div class="community-grid">
+                        <article class="discussion-room" data-category="문학 해석" data-level="beginner" data-book="1984">
+                            <div class="room-level-bar">
+                                <span class="room-level-text">Beginner</span>
+                            </div>
+                            <div class="room-topic">
+                                <h4>Hope and Resistance in Dystopian Worlds</h4>
+                                <div class="room-book-title">1984</div>
+                                <p>주인공이 절망 속에서 희망을 찾는 순간을 중심으로 토론해보세요.</p>
+                            </div>
+                            <div class="room-meta">
+                                <button class="btn join-btn" data-room="room-hope" data-level="beginner">참여하기</button>
+                                <span class="room-participants">6 / 6</span>
+                            </div>
+                        </article>
+                        <article class="discussion-room" data-category="사회 · 윤리" data-level="intermediate" data-book="1984">
+                            <div class="room-level-bar">
+                                <span class="room-level-text">Intermediate</span>
+                            </div>
+                            <div class="room-topic">
+                                <h4>Power of Language and Propaganda</h4>
+                                <div class="room-book-title">1984</div>
+                                <p>작품 속 언어 조작 기법이 오늘날 미디어와 어떻게 연결되는지 논의해보세요.</p>
+                            </div>
+                            <div class="room-meta">
+                                <button class="btn join-btn" data-room="room-language" data-level="intermediate">참여하기</button>
+                                <span class="room-participants">5 / 6</span>
+                            </div>
+                        </article>
+                        <article class="discussion-room" data-category="창의적 글쓰기" data-level="advanced" data-book="To Kill a Mockingbird">
+                            <div class="room-level-bar">
+                                <span class="room-level-text">Advanced</span>
+                            </div>
+                            <div class="room-topic">
+                                <h4>Alternate Ending Challenge</h4>
+                                <div class="room-book-title">To Kill a Mockingbird</div>
+                                <p>같은 설정에서 다른 결말을 상상하며 공동으로 리라이트해보세요.</p>
+                            </div>
+                            <div class="room-meta">
+                                <button class="btn join-btn" data-room="room-ending" data-level="advanced">참여하기</button>
+                                <span class="room-participants">4 / 6</span>
+                            </div>
+                        </article>
+                        <article class="discussion-room" data-category="문학 해석" data-level="intermediate" data-book="1984">
+                            <div class="room-level-bar">
+                                <span class="room-level-text">Intermediate</span>
+                            </div>
+                            <div class="room-topic">
+                                <h4>Character Empathy Circle</h4>
+                                <div class="room-book-title">1984</div>
+                                <p>등장인물의 감정과 선택을 공감하며 역할극 형식으로 토론합니다.</p>
+                            </div>
+                            <div class="room-meta">
+                                <button class="btn join-btn" data-room="room-empathy" data-level="intermediate">참여하기</button>
+                                <span class="room-participants">6 / 6</span>
+                            </div>
+                        </article>
+                    </div>
+                </article>
+            </section>
+        </div>
+
+        <div id="community-room-page">
+            <div class="community-room-container">
+                <section class="chat-pane">
+                    <header class="chat-header">
+                        <button class="chat-back-btn" aria-label="채팅 목록으로 돌아가기">← Back</button>
+                        <div class="chat-room-info">
+                            <h3 id="chat-room-title">Hope and Resistance in Dystopian Worlds</h3>
+                            <p id="chat-room-meta">실시간 참여 인원 · 6명</p>
+                        </div>
+                    </header>
+                    <div class="chat-body">
+                        <div class="chat-messages" id="chat-messages">
+                            <div class="message bot">
+                                <div class="user-meta">AI Facilitator · 19:24</div>
+                                <div class="bubble">오늘의 토론 질문: 절망적인 순간에도 주인공이 희망을 유지할 수 있었던 이유는 무엇일까요?</div>
+                            </div>
+                            <div class="message user-alt">
+                                <div class="user-meta">Mira · 19:25</div>
+                                <div class="bubble">I think it was the small memories he kept. Even tiny items reminded him of the world he wanted to restore.</div>
+                            </div>
+                            <div class="message user-alt">
+                                <div class="user-meta">Kai · 19:26</div>
+                                <div class="bubble">Agree! Also the act of writing his journal felt like an act of rebellion itself.</div>
+                            </div>
+                        </div>
+                        <form class="chat-input-area" id="chat-input-form">
+                            <div class="chat-input-group">
+                                <textarea id="chat-input" rows="2" placeholder="메시지를 입력하세요..." aria-label="채팅 메시지 입력"></textarea>
+                                <div class="chat-actions">
+                                    <select id="correction-lang-select" class="correction-lang-select" aria-label="교정 언어 선택">
+                                        <option value="EN">English (EN)</option>
+                                        <option value="KO">Korean (KO)</option>
+                                    </select>
+                                    <button type="button" class="btn tertiary-btn" id="ai-correction-btn">AI 교정 요청</button>
+                                    <button type="button" class="btn send-btn">전송</button>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="ai-correction-preview" id="ai-correction-preview">
+                            <h5>AI Correction Preview</h5>
+                            <p class="placeholder">입력한 문장의 교정 결과가 여기에 표시됩니다.</p>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- 원문 참조 패널 -->
+                <aside class="reference-panel" id="reference-panel">
+                    <div class="reference-panel-header">
+                        <h4>원문 참조</h4>
+                        <button type="button" class="reference-expand-btn" id="reference-expand-btn" aria-label="확장">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="reference-panel-content" id="reference-panel-content">
+                        <div class="reference-passage" id="reference-passage">
+                            <p class="reference-text">The morning air felt crisp as Winston opened the window. Sunlight touched the pages of his worn diary, and the quiet street below seemed peaceful for a moment.</p>
+                            <p class="reference-text">He wrote simple sentences about the day, promising himself to stay hopeful. Even small words carried meaning when they were spoken with care.</p>
+                        </div>
+                    </div>
+                    <div class="reference-panel-expanded" id="reference-panel-expanded" style="display: none;">
+                        <div class="reference-chapter-header">
+                            <div class="reference-chapter-select-wrapper">
+                                <label for="reference-chapter-select" class="reference-chapter-label">챕터 선택:</label>
+                                <select id="reference-chapter-select" class="reference-chapter-select">
+                                    <option value="1">Chapter 1. The Clock Strikes</option>
+                                    <option value="2">Chapter 2. Ministry of Truth</option>
+                                    <option value="3">Chapter 3. Memory and Dreams</option>
+                                    <option value="4">Chapter 4. Resistance Notes</option>
+                                </select>
+                            </div>
+                            <button type="button" class="reference-collapse-btn" id="reference-collapse-btn" aria-label="축소">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="15 18 9 12 15 6"></polyline>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="reference-chapter-content" id="reference-chapter-content">
+                            <div class="reference-level-toggle" style="display: none;">
+                                <button type="button" class="reference-level-btn active" data-level="beginner">Beginner</button>
+                                <button type="button" class="reference-level-btn" data-level="intermediate">Intermediate</button>
+                                <button type="button" class="reference-level-btn" data-level="advanced">Advanced</button>
+                            </div>
+                            <div class="reference-viewer" id="reference-viewer">
+                                <article class="reference-level-content active" data-level="beginner">
+                                    <p class="reference-text">The morning air felt crisp as Winston opened the window. Sunlight touched the pages of his worn diary, and the quiet street below seemed peaceful for a moment.</p>
+                                    <p class="reference-text">He wrote simple sentences about the day, promising himself to stay hopeful. Even small words carried meaning when they were spoken with care.</p>
+                                </article>
+                                <article class="reference-level-content" data-level="intermediate">
+                                    <p class="reference-text">Winston paused, letting the cool spring breeze filter through the curtains while the distant chime of thirteen echoed from the clocktower. The sound was familiar yet unsettling, a persistent reminder that ordinary routines were shaped by unseen hands.</p>
+                                    <p class="reference-text">He scribbled in his journal about fleeting moments of kindness he noticed in the city. Though subtle, each gesture hinted that quiet resistance might bloom in unexpected places.</p>
+                                </article>
+                                <article class="reference-level-content" data-level="advanced">
+                                    <p class="reference-text">Perched beside the narrow window, Winston contemplated the paradox of solitude within a crowded metropolis. The clocks' aberrant toll, striking thirteen, resonated like a ciphered warning threaded through the fabric of a regimented society.</p>
+                                    <p class="reference-text">In his journal he catalogued aberrations—the nuanced inflections in public speeches, the delicate rebellions disguised as courteous smiles. Each observation became an act of intellectual preservation against the gradual erosion of truth.</p>
+                                </article>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+
+        <div id="map-page">
+            <section class="features">
+                <article id="travel-map" class="feature-card map-container">
+                    <div class="map-header">
+                    </div>
+                    <div class="map-layout">
+                        <div class="map-wrapper">
+                            <div class="map-controls">
+                                <div class="map-search-container">
+                                    <input type="text" class="map-search-input" placeholder="장소를 검색하세요..." id="map-search-input">
+                                    <button type="button" class="map-search-btn" aria-label="검색">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="11" cy="11" r="8"></circle>
+                                            <path d="m21 21-4.35-4.35"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="map-action-buttons">
+                                    <button type="button" class="map-action-btn" id="nearby-places-btn">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                            <circle cx="12" cy="10" r="3"></circle>
+                                        </svg>
+                                        <span>주변 장소 추천</span>
+                                    </button>
+                                    <button type="button" class="map-action-btn" id="book-places-btn">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                                        </svg>
+                                        <span>책 속 장소 찾기</span>
+                                    </button>
+                                    <button type="button" class="map-action-btn" id="save-place-btn">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                                        </svg>
+                                        <span>장소 저장</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="map" style="height: 500px; width: 100%;"></div>
+                        </div>
+                        <aside class="reading-places-sidebar">
+                            <div class="sidebar-header">
+                                <h4>독서하기 좋은 장소</h4>
+                                <p class="sidebar-subtitle">독립 서점, 북카페 등</p>
+                            </div>
+                            <div class="sidebar-tabs">
+                                <button type="button" class="sidebar-tab-btn active" data-tab="recommended">추천 장소</button>
+                                <button type="button" class="sidebar-tab-btn" data-tab="saved">내가 저장한 장소</button>
+                            </div>
+                            <div class="places-list" id="places-list">
+                                <article class="place-item">
+                                    <div class="place-info">
+                                        <h5 class="place-name">책과 나무</h5>
+                                        <p class="place-address">서울특별시 종로구 인사동길 12</p>
+                                    </div>
+                                    <button type="button" class="place-record-btn">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                                        </svg>
+                                        <span>이곳에서 독서 기록 남기기</span>
+                                    </button>
+                                </article>
+                                <article class="place-item">
+                                    <div class="place-info">
+                                        <h5 class="place-name">문학의 정원</h5>
+                                        <p class="place-address">서울특별시 강남구 테헤란로 123</p>
+                                    </div>
+                                    <button type="button" class="place-record-btn">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                                        </svg>
+                                        <span>이곳에서 독서 기록 남기기</span>
+                                    </button>
+                                </article>
+                                <article class="place-item">
+                                    <div class="place-info">
+                                        <h5 class="place-name">커피와 책</h5>
+                                        <p class="place-address">서울특별시 마포구 홍대입구로 456</p>
+                                    </div>
+                                    <button type="button" class="place-record-btn">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                                        </svg>
+                                        <span>이곳에서 독서 기록 남기기</span>
+                                    </button>
+                                </article>
+                                <article class="place-item">
+                                    <div class="place-info">
+                                        <h5 class="place-name">독서실</h5>
+                                        <p class="place-address">서울특별시 서초구 서초대로 789</p>
+                                    </div>
+                                    <button type="button" class="place-record-btn">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                                        </svg>
+                                        <span>이곳에서 독서 기록 남기기</span>
+                                    </button>
+                                </article>
+                                <article class="place-item">
+                                    <div class="place-info">
+                                        <h5 class="place-name">책방 산책</h5>
+                                        <p class="place-address">서울특별시 성동구 성수이로 321</p>
+                                    </div>
+                                    <button type="button" class="place-record-btn">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                                        </svg>
+                                        <span>이곳에서 독서 기록 남기기</span>
+                                    </button>
+                                </article>
+                            </div>
+                            <div class="places-list" id="saved-places-list" style="display: none;">
+                                <!-- 저장된 장소 목록이 여기에 동적으로 추가됩니다 -->
+                            </div>
+                        </aside>
+                    </div>
+                </article>
+            </section>
+        </div>
+
+        <!-- 독서 플레이리스트 페이지 -->
+        <div id="playlist-page">
+            <section class="features">
+                <article class="feature-card playlist-container">
+                    <!-- 음악 검색창 -->
+                    <div class="playlist-search-section">
+                        <div class="playlist-search-wrapper">
+                            <input 
+                                type="text" 
+                                id="music-search-input"
+                                class="playlist-search-input" 
+                                placeholder="음악, 아티스트, 분위기로 검색..."
+                            >
+                            <button type="button" class="playlist-search-icon" id="music-search-btn" aria-label="검색">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <path d="m21 21-4.35-4.35"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <!-- Spotify 검색 결과 컨테이너 -->
+                        <div id="spotify-search-results" class="spotify-search-results" style="display: none;">
+                            <h3 class="search-results-title">검색 결과</h3>
+                            <div id="spotify-results-container" class="spotify-results-container"></div>
+                        </div>
+                    </div>
+
+                    <!-- 내 플레이리스트 -->
+                    <div class="playlist-section">
+                        <div class="playlist-section-header">
+                            <h3>📚 내 플레이리스트</h3>
+                            <p class="playlist-section-subtitle">내가 담은 플레이리스트와 음악</p>
+                            <button type="button" class="create-playlist-btn" id="create-playlist-btn">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                <span>새 플레이리스트 만들기</span>
+                            </button>
+                        </div>
+                        <div class="playlist-grid" id="my-playlists">
+                            <!-- 동적으로 생성될 플레이리스트 카드들 -->
+                            <div class="empty-playlist-message" id="empty-playlist-message" style="display: none;">
+                                <p>아직 담은 플레이리스트가 없습니다.</p>
+                                <p>공개 플레이리스트나 음악을 담아보세요!</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI 추천 음악 목록 -->
+                    <div class="playlist-section">
+                        <div class="playlist-section-header">
+                            <h3>🎵 AI 추천 음악</h3>
+                            <p class="playlist-section-subtitle">당신의 독서 스타일에 맞춘 추천</p>
+                        </div>
+                        <div class="music-grid" id="ai-recommended-music">
+                            <div class="music-card" data-music-id="ai-1">
+                                <div class="music-card-image">
+                                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M9 18V5l12-2v13"></path>
+                                        <circle cx="6" cy="18" r="3"></circle>
+                                        <circle cx="18" cy="16" r="3"></circle>
+                                    </svg>
+                                </div>
+                                <div class="music-card-info">
+                                    <h4 class="music-title">Moonlight Sonata</h4>
+                                    <p class="music-artist">Ludwig van Beethoven</p>
+                                    <p class="music-mood">집중 · 클래식</p>
+                                </div>
+                                <div class="music-card-actions">
+                                    <button type="button" class="music-play-btn" aria-label="재생">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M8 5v14l11-7z"/>
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="music-add-to-playlist-btn" aria-label="플레이리스트에 담기" data-music-id="ai-1">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="music-card" data-music-id="ai-2">
+                                <div class="music-card-image">
+                                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M9 18V5l12-2v13"></path>
+                                        <circle cx="6" cy="18" r="3"></circle>
+                                        <circle cx="18" cy="16" r="3"></circle>
+                                    </svg>
+                                </div>
+                                <div class="music-card-info">
+                                    <h4 class="music-title">Clair de Lune</h4>
+                                    <p class="music-artist">Claude Debussy</p>
+                                    <p class="music-mood">평온 · 인상파</p>
+                                </div>
+                                <div class="music-card-actions">
+                                    <button type="button" class="music-play-btn" aria-label="재생">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M8 5v14l11-7z"/>
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="music-add-to-playlist-btn" aria-label="플레이리스트에 담기" data-music-id="ai-2">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="music-card" data-music-id="ai-3">
+                                <div class="music-card-image">
+                                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M9 18V5l12-2v13"></path>
+                                        <circle cx="6" cy="18" r="3"></circle>
+                                        <circle cx="18" cy="16" r="3"></circle>
+                                    </svg>
+                                </div>
+                                <div class="music-card-info">
+                                    <h4 class="music-title">Gymnopédie No. 1</h4>
+                                    <p class="music-artist">Erik Satie</p>
+                                    <p class="music-mood">명상 · 미니멀</p>
+                                </div>
+                                <div class="music-card-actions">
+                                    <button type="button" class="music-play-btn" aria-label="재생">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M8 5v14l11-7z"/>
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="music-add-to-playlist-btn" aria-label="플레이리스트에 담기" data-music-id="ai-3">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="music-card" data-music-id="ai-4">
+                                <div class="music-card-image">
+                                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M9 18V5l12-2v13"></path>
+                                        <circle cx="6" cy="18" r="3"></circle>
+                                        <circle cx="18" cy="16" r="3"></circle>
+                                    </svg>
+                                </div>
+                                <div class="music-card-info">
+                                    <h4 class="music-title">The Four Seasons - Spring</h4>
+                                    <p class="music-artist">Antonio Vivaldi</p>
+                                    <p class="music-mood">활기 · 바로크</p>
+                                </div>
+                                <div class="music-card-actions">
+                                    <button type="button" class="music-play-btn" aria-label="재생">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M8 5v14l11-7z"/>
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="music-add-to-playlist-btn" aria-label="플레이리스트에 담기" data-music-id="ai-4">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="music-card" data-music-id="ai-5">
+                                <div class="music-card-image">
+                                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M9 18V5l12-2v13"></path>
+                                        <circle cx="6" cy="18" r="3"></circle>
+                                        <circle cx="18" cy="16" r="3"></circle>
+                                    </svg>
+                                </div>
+                                <div class="music-card-info">
+                                    <h4 class="music-title">Canon in D</h4>
+                                    <p class="music-artist">Johann Pachelbel</p>
+                                    <p class="music-mood">차분 · 바로크</p>
+                                </div>
+                                <div class="music-card-actions">
+                                    <button type="button" class="music-play-btn" aria-label="재생">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M8 5v14l11-7z"/>
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="music-add-to-playlist-btn" aria-label="플레이리스트에 담기" data-music-id="ai-5">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="music-card" data-music-id="ai-6">
+                                <div class="music-card-image">
+                                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M9 18V5l12-2v13"></path>
+                                        <circle cx="6" cy="18" r="3"></circle>
+                                        <circle cx="18" cy="16" r="3"></circle>
+                                    </svg>
+                                </div>
+                                <div class="music-card-info">
+                                    <h4 class="music-title">Nocturne Op. 9 No. 2</h4>
+                                    <p class="music-artist">Frédéric Chopin</p>
+                                    <p class="music-mood">감성 · 낭만주의</p>
+                                </div>
+                                <div class="music-card-actions">
+                                    <button type="button" class="music-play-btn" aria-label="재생">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M8 5v14l11-7z"/>
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="music-add-to-playlist-btn" aria-label="플레이리스트에 담기" data-music-id="ai-6">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 인기 음악 목록 -->
+                    <div class="playlist-section">
+                        <div class="playlist-section-header">
+                            <h3>🔥 인기 음악</h3>
+                            <p class="playlist-section-subtitle">지금 가장 많이 재생되는 음악</p>
+                        </div>
+                        <div class="music-grid" id="popular-music">
+                            <div class="music-card" data-music-id="pop-1">
+                                <div class="music-card-image">
+                                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M9 18V5l12-2v13"></path>
+                                        <circle cx="6" cy="18" r="3"></circle>
+                                        <circle cx="18" cy="16" r="3"></circle>
+                                    </svg>
+                                </div>
+                                <div class="music-card-info">
+                                    <h4 class="music-title">Classical Reading Playlist</h4>
+                                    <p class="music-artist">Various Artists</p>
+                                    <p class="music-mood">인기 · 플레이리스트</p>
+                                </div>
+                                <div class="music-card-actions">
+                                    <button type="button" class="music-play-btn" aria-label="재생">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M8 5v14l11-7z"/>
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="music-add-to-playlist-btn" aria-label="플레이리스트에 담기" data-music-id="pop-1">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="music-card" data-music-id="pop-2">
+                                <div class="music-card-image">
+                                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M9 18V5l12-2v13"></path>
+                                        <circle cx="6" cy="18" r="3"></circle>
+                                        <circle cx="18" cy="16" r="3"></circle>
+                                    </svg>
+                                </div>
+                                <div class="music-card-info">
+                                    <h4 class="music-title">Ambient Reading Sounds</h4>
+                                    <p class="music-artist">Nature Sounds</p>
+                                    <p class="music-mood">자연 · 앰비언트</p>
+                                </div>
+                                <div class="music-card-actions">
+                                    <button type="button" class="music-play-btn" aria-label="재생">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M8 5v14l11-7z"/>
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="music-add-to-playlist-btn" aria-label="플레이리스트에 담기" data-music-id="pop-3">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="music-card" data-music-id="pop-3">
+                                <div class="music-card-image">
+                                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M9 18V5l12-2v13"></path>
+                                        <circle cx="6" cy="18" r="3"></circle>
+                                        <circle cx="18" cy="16" r="3"></circle>
+                                    </svg>
+                                </div>
+                                <div class="music-card-info">
+                                    <h4 class="music-title">Jazz for Reading</h4>
+                                    <p class="music-artist">Smooth Jazz Collection</p>
+                                    <p class="music-mood">부드러움 · 재즈</p>
+                                </div>
+                                <div class="music-card-actions">
+                                    <button type="button" class="music-play-btn" aria-label="재생">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M8 5v14l11-7z"/>
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="music-add-to-playlist-btn" aria-label="플레이리스트에 담기" data-music-id="pop-4">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="music-card" data-music-id="pop-4">
+                                <div class="music-card-image">
+                                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M9 18V5l12-2v13"></path>
+                                        <circle cx="6" cy="18" r="3"></circle>
+                                        <circle cx="18" cy="16" r="3"></circle>
+                                    </svg>
+                                </div>
+                                <div class="music-card-info">
+                                    <h4 class="music-title">Lo-Fi Study Beats</h4>
+                                    <p class="music-artist">Chillhop Music</p>
+                                    <p class="music-mood">편안함 · Lo-Fi</p>
+                                </div>
+                                <div class="music-card-actions">
+                                    <button type="button" class="music-play-btn" aria-label="재생">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M8 5v14l11-7z"/>
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="music-add-to-playlist-btn" aria-label="플레이리스트에 담기" data-music-id="pop-5">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="music-card" data-music-id="pop-5">
+                                <div class="music-card-image">
+                                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M9 18V5l12-2v13"></path>
+                                        <circle cx="6" cy="18" r="3"></circle>
+                                        <circle cx="18" cy="16" r="3"></circle>
+                                    </svg>
+                                </div>
+                                <div class="music-card-info">
+                                    <h4 class="music-title">Piano Meditation</h4>
+                                    <p class="music-artist">Peaceful Piano</p>
+                                    <p class="music-mood">명상 · 피아노</p>
+                                </div>
+                                <div class="music-card-actions">
+                                    <button type="button" class="music-play-btn" aria-label="재생">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M8 5v14l11-7z"/>
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="music-add-to-playlist-btn" aria-label="플레이리스트에 담기" data-music-id="pop-6">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="music-card" data-music-id="pop-6">
+                                <div class="music-card-image">
+                                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M9 18V5l12-2v13"></path>
+                                        <circle cx="6" cy="18" r="3"></circle>
+                                        <circle cx="18" cy="16" r="3"></circle>
+                                    </svg>
+                                </div>
+                                <div class="music-card-info">
+                                    <h4 class="music-title">Rain Sounds for Reading</h4>
+                                    <p class="music-artist">Nature Ambience</p>
+                                    <p class="music-mood">비 · 자연음</p>
+                                </div>
+                                <div class="music-card-actions">
+                                    <button type="button" class="music-play-btn" aria-label="재생">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M8 5v14l11-7z"/>
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="music-add-to-playlist-btn" aria-label="플레이리스트에 담기" data-music-id="pop-6">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 최근 선택 목록 -->
+                    <div class="playlist-section">
+                        <div class="playlist-section-header">
+                            <h3>⏱️ 최근 선택</h3>
+                            <p class="playlist-section-subtitle">최근에 재생한 음악</p>
+                        </div>
+                        <div class="music-grid" id="recent-music">
+                            <div class="music-card" data-music-id="recent-1">
+                                <div class="music-card-image">
+                                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M9 18V5l12-2v13"></path>
+                                        <circle cx="6" cy="18" r="3"></circle>
+                                        <circle cx="18" cy="16" r="3"></circle>
+                                    </svg>
+                                </div>
+                                <div class="music-card-info">
+                                    <h4 class="music-title">Moonlight Sonata</h4>
+                                    <p class="music-artist">Ludwig van Beethoven</p>
+                                    <p class="music-mood">2시간 전</p>
+                                </div>
+                                <div class="music-card-actions">
+                                    <button type="button" class="music-play-btn" aria-label="재생">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M8 5v14l11-7z"/>
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="music-add-to-playlist-btn" aria-label="플레이리스트에 담기" data-music-id="recent-2">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="music-card" data-music-id="recent-2">
+                                <div class="music-card-image">
+                                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M9 18V5l12-2v13"></path>
+                                        <circle cx="6" cy="18" r="3"></circle>
+                                        <circle cx="18" cy="16" r="3"></circle>
+                                    </svg>
+                                </div>
+                                <div class="music-card-info">
+                                    <h4 class="music-title">Classical Reading Playlist</h4>
+                                    <p class="music-artist">Various Artists</p>
+                                    <p class="music-mood">어제</p>
+                                </div>
+                                <button type="button" class="music-play-btn" aria-label="재생">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M8 5v14l11-7z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="music-card" data-music-id="recent-3">
+                                <div class="music-card-image">
+                                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M9 18V5l12-2v13"></path>
+                                        <circle cx="6" cy="18" r="3"></circle>
+                                        <circle cx="18" cy="16" r="3"></circle>
+                                    </svg>
+                                </div>
+                                <div class="music-card-info">
+                                    <h4 class="music-title">Clair de Lune</h4>
+                                    <p class="music-artist">Claude Debussy</p>
+                                    <p class="music-mood">3일 전</p>
+                                </div>
+                                <div class="music-card-actions">
+                                    <button type="button" class="music-play-btn" aria-label="재생">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M8 5v14l11-7z"/>
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="music-add-to-playlist-btn" aria-label="플레이리스트에 담기" data-music-id="recent-3">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 공개 플레이리스트 목록 -->
+                    <div class="playlist-section">
+                        <div class="playlist-section-header">
+                            <h3>🌐 공개 플레이리스트</h3>
+                            <p class="playlist-section-subtitle">다른 사용자들이 만든 플레이리스트</p>
+                        </div>
+                        <div class="playlist-grid" id="public-playlists">
+                            <div class="public-playlist-card" data-playlist-id="public-1">
+                                <div class="playlist-card-image">
+                                    <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                                        <line x1="15" y1="3" x2="15" y2="21"></line>
+                                    </svg>
+                                </div>
+                                <div class="playlist-card-content">
+                                    <h4 class="playlist-card-title">심야 독서를 위한 클래식</h4>
+                                    <p class="playlist-card-creator">by 독서인123</p>
+                                    <p class="playlist-card-info">12곡 · 45분</p>
+                                    <div class="playlist-card-likes">
+                                        <button type="button" class="playlist-like-btn" aria-label="좋아요" data-playlist-id="public-1">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                            </svg>
+                                        </button>
+                                        <span class="playlist-like-count" data-playlist-id="public-1">0</span>
+                                    </div>
+                                </div>
+                                <div class="playlist-card-actions">
+                                    <button type="button" class="playlist-play-btn" aria-label="재생">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M8 5v14l11-7z"/>
+                                        </svg>
+                                        <span>재생</span>
+                                    </button>
+                                    <button type="button" class="playlist-add-btn" aria-label="담기">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                        <span>담기</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="public-playlist-card" data-playlist-id="public-2">
+                                <div class="playlist-card-image">
+                                    <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                                        <line x1="15" y1="3" x2="15" y2="21"></line>
+                                    </svg>
+                                </div>
+                                <div class="playlist-card-content">
+                                    <h4 class="playlist-card-title">집중력 향상을 위한 Lo-Fi</h4>
+                                    <p class="playlist-card-creator">by 책벌레99</p>
+                                    <p class="playlist-card-info">20곡 · 1시간 15분</p>
+                                    <div class="playlist-card-likes">
+                                        <button type="button" class="playlist-like-btn" aria-label="좋아요" data-playlist-id="public-2">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                            </svg>
+                                        </button>
+                                        <span class="playlist-like-count" data-playlist-id="public-2">0</span>
+                                    </div>
+                                </div>
+                                <div class="playlist-card-actions">
+                                    <button type="button" class="playlist-play-btn" aria-label="재생">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M8 5v14l11-7z"/>
+                                        </svg>
+                                        <span>재생</span>
+                                    </button>
+                                    <button type="button" class="playlist-add-btn" aria-label="담기">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                        <span>담기</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="public-playlist-card" data-playlist-id="public-3">
+                                <div class="playlist-card-image">
+                                    <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                                        <line x1="15" y1="3" x2="15" y2="21"></line>
+                                    </svg>
+                                </div>
+                                <div class="playlist-card-content">
+                                    <h4 class="playlist-card-title">아침 독서를 위한 재즈</h4>
+                                    <p class="playlist-card-creator">by 문학여행자</p>
+                                    <p class="playlist-card-info">15곡 · 55분</p>
+                                    <div class="playlist-card-likes">
+                                        <button type="button" class="playlist-like-btn" aria-label="좋아요" data-playlist-id="public-3">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                            </svg>
+                                        </button>
+                                        <span class="playlist-like-count" data-playlist-id="public-3">0</span>
+                                    </div>
+                                </div>
+                                <div class="playlist-card-actions">
+                                    <button type="button" class="playlist-play-btn" aria-label="재생">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M8 5v14l11-7z"/>
+                                        </svg>
+                                        <span>재생</span>
+                                    </button>
+                                    <button type="button" class="playlist-add-btn" aria-label="담기">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                        <span>담기</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="public-playlist-card" data-playlist-id="public-4">
+                                <div class="playlist-card-image">
+                                    <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                                        <line x1="15" y1="3" x2="15" y2="21"></line>
+                                    </svg>
+                                </div>
+                                <div class="playlist-card-content">
+                                    <h4 class="playlist-card-title">비 오는 날의 독서 음악</h4>
+                                    <p class="playlist-card-creator">by 독서마니아</p>
+                                    <p class="playlist-card-info">18곡 · 1시간 10분</p>
+                                    <div class="playlist-card-likes">
+                                        <button type="button" class="playlist-like-btn" aria-label="좋아요" data-playlist-id="public-4">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                            </svg>
+                                        </button>
+                                        <span class="playlist-like-count" data-playlist-id="public-4">0</span>
+                                    </div>
+                                </div>
+                                <div class="playlist-card-actions">
+                                    <button type="button" class="playlist-play-btn" aria-label="재생">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M8 5v14l11-7z"/>
+                                        </svg>
+                                        <span>재생</span>
+                                    </button>
+                                    <button type="button" class="playlist-add-btn" aria-label="담기">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                        <span>담기</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="public-playlist-card" data-playlist-id="public-5">
+                                <div class="playlist-card-image">
+                                    <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                                        <line x1="15" y1="3" x2="15" y2="21"></line>
+                                    </svg>
+                                </div>
+                                <div class="playlist-card-content">
+                                    <h4 class="playlist-card-title">명상과 독서를 위한 앰비언트</h4>
+                                    <p class="playlist-card-creator">by 평화로운독서</p>
+                                    <p class="playlist-card-info">25곡 · 2시간</p>
+                                    <div class="playlist-card-likes">
+                                        <button type="button" class="playlist-like-btn" aria-label="좋아요" data-playlist-id="public-5">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                            </svg>
+                                        </button>
+                                        <span class="playlist-like-count" data-playlist-id="public-5">0</span>
+                                    </div>
+                                </div>
+                                <div class="playlist-card-actions">
+                                    <button type="button" class="playlist-play-btn" aria-label="재생">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M8 5v14l11-7z"/>
+                                        </svg>
+                                        <span>재생</span>
+                                    </button>
+                                    <button type="button" class="playlist-add-btn" aria-label="담기">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                        <span>담기</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="public-playlist-card" data-playlist-id="public-6">
+                                <div class="playlist-card-image">
+                                    <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                                        <line x1="15" y1="3" x2="15" y2="21"></line>
+                                    </svg>
+                                </div>
+                                <div class="playlist-card-content">
+                                    <h4 class="playlist-card-title">바로크 시대의 독서 음악</h4>
+                                    <p class="playlist-card-creator">by 클래식러버</p>
+                                    <p class="playlist-card-info">10곡 · 40분</p>
+                                    <div class="playlist-card-likes">
+                                        <button type="button" class="playlist-like-btn" aria-label="좋아요" data-playlist-id="public-6">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                            </svg>
+                                        </button>
+                                        <span class="playlist-like-count" data-playlist-id="public-6">0</span>
+                                    </div>
+                                </div>
+                                <div class="playlist-card-actions">
+                                    <button type="button" class="playlist-play-btn" aria-label="재생">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M8 5v14l11-7z"/>
+                                        </svg>
+                                        <span>재생</span>
+                                    </button>
+                                    <button type="button" class="playlist-add-btn" aria-label="담기">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                        <span>담기</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </section>
+        </div>
+    </main>
+    
+    <!-- 설정 모달 -->
+    <div class="settings-modal" id="settings-modal">
+        <div class="settings-modal-content">
+            <div class="settings-modal-header">
+                <h2>설정</h2>
+                <button type="button" class="settings-modal-close" id="settings-modal-close" aria-label="닫기">×</button>
+            </div>
+            <div class="settings-modal-body">
+                <div class="settings-section">
+                    <label for="settings-profile">프로필 이미지</label>
+                    <div class="profile-image-upload">
+                        <div class="profile-image-preview" id="profile-image-preview">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </div>
+                        <input type="file" id="settings-profile" class="settings-file-input" accept="image/*" style="display: none;">
+                        <button type="button" class="settings-upload-btn" id="settings-upload-btn">이미지 선택</button>
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <label for="settings-nickname">닉네임</label>
+                    <input type="text" id="settings-nickname" class="settings-input" placeholder="닉네임을 입력하세요" value="독서인">
+                    <button type="button" class="settings-save-btn" data-setting="nickname">저장</button>
+                </div>
+                <div class="settings-section">
+                    <label for="settings-email">이메일</label>
+                    <input type="email" id="settings-email" class="settings-input" placeholder="이메일을 입력하세요" value="reader@litconnect.com">
+                    <button type="button" class="settings-save-btn" data-setting="email">저장</button>
+                </div>
+                <div class="settings-section">
+                    <label for="settings-bio">한줄 소개</label>
+                    <input type="text" id="settings-bio" class="settings-input" placeholder="자신을 한 줄로 소개해주세요" maxlength="100">
+                    <button type="button" class="settings-save-btn" data-setting="bio">저장</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 공개 플레이리스트 상세 모달 -->
+    <div class="playlist-detail-modal" id="playlist-detail-modal">
+        <div class="playlist-detail-modal-content">
+            <button type="button" class="playlist-detail-modal-close" id="playlist-detail-modal-close" aria-label="닫기">×</button>
+            <div class="playlist-detail-header">
+                <div class="playlist-detail-thumbnail" id="playlist-detail-thumbnail">
+                    <img id="playlist-detail-thumbnail-img" style="display: none; width: 100%; height: 100%; object-fit: cover;" alt="플레이리스트 썸네일">
+                    <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" id="playlist-detail-thumbnail-svg">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                        <line x1="15" y1="3" x2="15" y2="21"></line>
+                    </svg>
+                    <button type="button" class="playlist-thumbnail-edit-btn" id="playlist-thumbnail-edit-btn" aria-label="이미지 편집" style="display: none;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                    </button>
+                    <input type="file" id="playlist-thumbnail-input" accept="image/*" style="display: none;">
+                </div>
+                <div class="playlist-detail-header-info">
+                    <h2 id="playlist-detail-title">플레이리스트 제목</h2>
+                    <p id="playlist-detail-description">플레이리스트에 대한 간단한 설명이 여기에 표시됩니다.</p>
+                    <div class="playlist-detail-likes" id="playlist-detail-likes">
+                        <button type="button" class="playlist-detail-like-btn" aria-label="좋아요" id="playlist-detail-like-btn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                            </svg>
+                        </button>
+                        <span class="playlist-detail-like-count" id="playlist-detail-like-count">0</span>
+                    </div>
+                </div>
+            </div>
+            <div class="playlist-detail-tracks">
+                <h3 class="playlist-detail-tracks-title">곡 목록</h3>
+                <div class="playlist-detail-tracks-list" id="playlist-detail-tracks-list">
+                    <!-- 동적으로 생성될 곡 목록 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 내 플레이리스트 생성 모달 -->
+    <div class="create-playlist-modal" id="create-playlist-modal">
+        <div class="create-playlist-modal-content">
+            <div class="create-playlist-modal-header">
+                <h2>새 플레이리스트 만들기</h2>
+                <button type="button" class="create-playlist-modal-close" id="create-playlist-modal-close" aria-label="닫기">×</button>
+            </div>
+            <div class="create-playlist-modal-body">
+                <div class="create-playlist-form-group">
+                    <label for="new-playlist-name">플레이리스트 이름</label>
+                    <input type="text" id="new-playlist-name" class="create-playlist-input" placeholder="플레이리스트 이름을 입력하세요">
+                </div>
+                <div class="create-playlist-form-group">
+                    <label for="new-playlist-description">설명 (선택사항)</label>
+                    <textarea id="new-playlist-description" class="create-playlist-textarea" placeholder="플레이리스트에 대한 설명을 입력하세요" rows="3"></textarea>
+                </div>
+                <div class="create-playlist-form-group">
+                    <label>공개 설정</label>
+                    <div class="playlist-visibility-toggle">
+                        <label class="visibility-option">
+                            <input type="radio" name="playlist-visibility" value="public" checked>
+                            <span class="visibility-label">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                                공개
+                            </span>
+                        </label>
+                        <label class="visibility-option">
+                            <input type="radio" name="playlist-visibility" value="private">
+                            <span class="visibility-label">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                </svg>
+                                비공개
+                            </span>
+                        </label>
+                    </div>
+                </div>
+                <div class="create-playlist-modal-actions">
+                    <button type="button" class="create-playlist-cancel-btn" id="create-playlist-cancel-btn">취소</button>
+                    <button type="button" class="create-playlist-submit-btn" id="create-playlist-submit-btn">만들기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 플레이리스트 공유 모달 -->
+    <div class="share-playlist-modal" id="share-playlist-modal">
+        <div class="share-playlist-modal-content">
+            <div class="share-playlist-modal-header">
+                <h2>플레이리스트 공유</h2>
+                <button type="button" class="share-playlist-modal-close" id="share-playlist-modal-close" aria-label="닫기">×</button>
+            </div>
+            <div class="share-playlist-modal-body">
+                <div class="share-playlist-link-container">
+                    <label for="share-playlist-link">공유 링크</label>
+                    <div class="share-link-input-wrapper">
+                        <input type="text" id="share-playlist-link" class="share-link-input" readonly>
+                        <button type="button" class="copy-link-btn" id="copy-link-btn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                            복사
+                        </button>
+                    </div>
+                </div>
+                <div class="share-playlist-visibility-toggle">
+                    <label>공개 설정</label>
+                    <div class="playlist-visibility-toggle">
+                        <label class="visibility-option">
+                            <input type="radio" name="share-playlist-visibility" value="public">
+                            <span class="visibility-label">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                                공개
+                            </span>
+                        </label>
+                        <label class="visibility-option">
+                            <input type="radio" name="share-playlist-visibility" value="private">
+                            <span class="visibility-label">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                </svg>
+                                비공개
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 내 플레이리스트 상세 모달 -->
+    <div class="my-playlist-detail-modal" id="my-playlist-detail-modal">
+        <div class="my-playlist-detail-modal-content">
+            <button type="button" class="my-playlist-detail-modal-close" id="my-playlist-detail-modal-close" aria-label="닫기">×</button>
+            <div class="my-playlist-detail-header">
+                <div class="my-playlist-detail-thumbnail">
+                    <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" id="my-playlist-detail-thumbnail-svg">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                        <line x1="15" y1="3" x2="15" y2="21"></line>
+                    </svg>
+                </div>
+                <div class="my-playlist-detail-header-info">
+                    <h2 id="my-playlist-detail-title">내 플레이리스트</h2>
+                    <p id="my-playlist-detail-description">플레이리스트 설명</p>
+                    <div class="my-playlist-detail-actions">
+                        <div class="my-playlist-detail-likes" id="my-playlist-detail-likes">
+                            <button type="button" class="my-playlist-detail-like-btn" aria-label="좋아요" id="my-playlist-detail-like-btn">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                </svg>
+                            </button>
+                            <span class="my-playlist-detail-like-count" id="my-playlist-detail-like-count">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="my-playlist-detail-tracks">
+                <div class="my-playlist-detail-tracks-header">
+                    <h3 class="my-playlist-detail-tracks-title">곡 목록</h3>
+                    <button type="button" class="add-track-to-playlist-btn" id="add-track-to-playlist-btn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        <span>곡 추가</span>
+                    </button>
+                </div>
+                <div class="my-playlist-detail-tracks-list" id="my-playlist-detail-tracks-list">
+                    <!-- 동적으로 생성될 곡 목록 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 플레이리스트 선택 모달 -->
+    <div class="select-playlist-modal" id="select-playlist-modal">
+        <div class="select-playlist-modal-content">
+            <div class="select-playlist-modal-header">
+                <h2>플레이리스트 선택</h2>
+                <button type="button" class="select-playlist-modal-close" id="select-playlist-modal-close" aria-label="닫기">×</button>
+            </div>
+            <div class="select-playlist-modal-body">
+                <p class="select-playlist-info">곡을 추가할 플레이리스트를 선택하세요.</p>
+                <div class="select-playlist-list" id="select-playlist-list">
+                    <!-- 플레이리스트 목록 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 커뮤니티 생성 모달 -->
+    <div class="create-community-modal" id="create-community-modal">
+        <div class="create-community-modal-content">
+            <div class="create-community-modal-header">
+                <h2>새 커뮤니티 만들기</h2>
+                <button type="button" class="create-community-modal-close" id="create-community-modal-close" aria-label="닫기">×</button>
+            </div>
+            <div class="create-community-modal-body">
+                <div class="create-community-form-group">
+                    <label for="new-community-title">커뮤니티 제목</label>
+                    <input type="text" id="new-community-title" class="create-community-input" placeholder="커뮤니티 제목을 입력하세요">
+                </div>
+                <div class="create-community-form-group">
+                    <label for="new-community-insight">설명</label>
+                    <textarea id="new-community-insight" class="create-community-textarea" placeholder="토론 주제에 대한 설명을 입력하세요" rows="3"></textarea>
+                </div>
+                <div class="create-community-form-group">
+                    <label for="new-community-category">카테고리</label>
+                    <select id="new-community-category" class="create-community-select">
+                        <option value="문학 해석">문학 해석</option>
+                        <option value="사회 · 윤리">사회 · 윤리</option>
+                        <option value="창의적 글쓰기">창의적 글쓰기</option>
+                        <option value="언어 학습">언어 학습</option>
+                        <option value="작가 탐구">작가 탐구</option>
+                        <option value="사회 연계">사회 연계</option>
+                    </select>
+                </div>
+                <div class="create-community-form-group">
+                    <label for="new-community-level">레벨</label>
+                    <select id="new-community-level" class="create-community-select">
+                        <option value="beginner">Beginner</option>
+                        <option value="intermediate">Intermediate</option>
+                        <option value="advanced">Advanced</option>
+                    </select>
+                </div>
+                <div class="create-community-form-group">
+                    <label for="new-community-book">책 선택</label>
+                    <select id="new-community-book" class="create-community-select" required>
+                        <option value="">책을 선택하세요</option>
+                        <!-- 동적으로 생성될 책 목록 -->
+                    </select>
+                </div>
+                <div class="create-community-form-group">
+                    <label for="new-community-max-participants">최대 참여 인원</label>
+                    <input type="number" id="new-community-max-participants" class="create-community-input" placeholder="최대 참여 인원 수" min="2" max="6" value="6">
+                </div>
+                <div class="create-community-modal-actions">
+                    <button type="button" class="create-community-cancel-btn" id="create-community-cancel-btn">취소</button>
+                    <button type="button" class="create-community-submit-btn" id="create-community-submit-btn">만들기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 장소 저장 모달 -->
+    <div class="save-place-modal" id="save-place-modal">
+        <div class="save-place-modal-content">
+            <div class="save-place-modal-header">
+                <h2>장소 저장</h2>
+                <button type="button" class="save-place-modal-close" id="save-place-modal-close" aria-label="닫기">×</button>
+            </div>
+            <div class="save-place-modal-body">
+                <div class="save-place-form-group">
+                    <label for="save-place-name">장소 이름</label>
+                    <input type="text" id="save-place-name" class="save-place-input" placeholder="장소 이름을 입력하세요" required>
+                </div>
+                <div class="save-place-form-group">
+                    <label for="save-place-address">주소</label>
+                    <input type="text" id="save-place-address" class="save-place-input" placeholder="주소를 입력하세요" required>
+                </div>
+                <div class="save-place-form-group">
+                    <label for="save-place-description">설명 (선택사항)</label>
+                    <textarea id="save-place-description" class="save-place-textarea" placeholder="장소에 대한 설명을 입력하세요" rows="3"></textarea>
+                </div>
+                <div class="save-place-form-group">
+                    <label>공개 설정</label>
+                    <div class="save-place-visibility-toggle">
+                        <label class="save-place-visibility-option">
+                            <input type="radio" name="save-place-visibility" value="public" checked>
+                            <span class="save-place-visibility-label">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                                공개
+                            </span>
+                        </label>
+                        <label class="save-place-visibility-option">
+                            <input type="radio" name="save-place-visibility" value="private">
+                            <span class="save-place-visibility-label">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                </svg>
+                                비공개
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="save-place-modal-actions">
+                <button type="button" class="save-place-cancel-btn" id="save-place-cancel-btn">취소</button>
+                <button type="button" class="save-place-submit-btn" id="save-place-submit-btn">저장</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script type="module">
+        // Google Generative AI SDK 로드 (최신 버전 사용)
+        import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai@latest";
+        window.GoogleGenerativeAI = GoogleGenerativeAI;
+        console.log('✅ Google Generative AI SDK 로드 완료');
+    </script>
+    <!-- script.js는 SDK 스크립트 로드 후에 실행됨 -->
+    <script src="script.js"></script>
+</body>
+</html>
+
