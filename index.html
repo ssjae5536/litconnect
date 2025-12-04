@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LitConnect</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Spotify Web Playback SDK - script.js보다 먼저 로드되어야 함 -->
-    <script src="https://sdk.scdn.co/spotify-player.js"></script>
+    <!-- Spotify Web Playback SDK 제거됨 (검색 기능만 사용) -->
 </head>
 <body>
     <main>
@@ -272,27 +271,6 @@
                         </select>
                     </div>
                     <div class="books-grid" id="books-grid">
-                        <div class="book-card" data-book="1984" data-recommended="95" data-weekday-views="1240" data-monthly-views="5420">
-                            <div class="book-card-info">
-                                <h4 class="book-card-title">1984</h4>
-                                <p class="book-card-author">George Orwell</p>
-                                <p class="book-card-genre">Dystopian Fiction</p>
-                                <div class="book-card-buttons">
-                                    <button type="button" class="book-summary-btn" data-book="1984">줄거리</button>
-                                    <button type="button" class="book-select-btn" data-book="1984">보기</button>
-                                </div>
-                            </div>
-                            <div class="book-summary-popup" id="summary-popup-1984">
-                                <button type="button" class="summary-popup-close" aria-label="닫기">×</button>
-                                <div class="summary-popup-content">
-                                    <h4>1984</h4>
-                                    <p class="summary-author">George Orwell</p>
-                                    <div class="summary-text">
-                                        <p>빅 브라더가 감시하는 전체주의 사회에서 주인공 윈스턴이 자유와 진실을 찾아 저항하는 디스토피아 소설입니다. 감시와 통제가 일상이 된 세계에서 개인의 사상과 감정까지도 억압당하는 모습을 통해 권력의 폭정과 진실의 왜곡을 날카롭게 비판합니다.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                         <div class="book-card" data-book="gatsby" data-recommended="88" data-weekday-views="980" data-monthly-views="4320">
                             <div class="book-card-info">
                                 <h4 class="book-card-title">The Great Gatsby</h4>
@@ -300,7 +278,7 @@
                                 <p class="book-card-genre">Classic Literature</p>
                                 <div class="book-card-buttons">
                                     <button type="button" class="book-summary-btn" data-book="gatsby">줄거리</button>
-                                    <button type="button" class="book-select-btn" data-book="gatsby">보기</button>
+                                    <button type="button" class="book-select-btn view-btn" data-book="gatsby" data-book-title="The Great Gatsby">보기</button>
                                 </div>
                             </div>
                             <div class="book-summary-popup" id="summary-popup-gatsby">
@@ -321,7 +299,7 @@
                                 <p class="book-card-genre">Romance, Classic</p>
                                 <div class="book-card-buttons">
                                     <button type="button" class="book-summary-btn" data-book="pride">줄거리</button>
-                                    <button type="button" class="book-select-btn" data-book="pride">보기</button>
+                                    <button type="button" class="book-select-btn view-btn" data-book="pride" data-book-title="Pride and Prejudice">보기</button>
                                 </div>
                             </div>
                             <div class="book-summary-popup" id="summary-popup-pride">
@@ -335,6 +313,27 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="book-card" data-book="1984" data-recommended="95" data-weekday-views="1240" data-monthly-views="5420">
+                            <div class="book-card-info">
+                                <h4 class="book-card-title">1984</h4>
+                                <p class="book-card-author">George Orwell</p>
+                                <p class="book-card-genre">Dystopian Fiction</p>
+                                <div class="book-card-buttons">
+                                    <button type="button" class="book-summary-btn" data-book="1984">줄거리</button>
+                                    <button type="button" class="book-select-btn view-btn" data-book="1984" data-book-title="1984">보기</button>
+                                </div>
+                            </div>
+                            <div class="book-summary-popup" id="summary-popup-1984">
+                                <button type="button" class="summary-popup-close" aria-label="닫기">×</button>
+                                <div class="summary-popup-content">
+                                    <h4>1984</h4>
+                                    <p class="summary-author">George Orwell</p>
+                                    <div class="summary-text">
+                                        <p>빅 브라더가 감시하는 전체주의 사회에서 주인공 윈스턴이 자유와 진실을 찾아 저항하는 디스토피아 소설입니다. 감시와 통제가 일상이 된 세계에서 개인의 사상과 감정까지도 억압당하는 모습을 통해 권력의 폭정과 진실의 왜곡을 날카롭게 비판합니다.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="book-card" data-book="mockingbird" data-recommended="90" data-weekday-views="1050" data-monthly-views="4680">
                             <div class="book-card-info">
                                 <h4 class="book-card-title">To Kill a Mockingbird</h4>
@@ -342,7 +341,7 @@
                                 <p class="book-card-genre">Coming-of-Age</p>
                                 <div class="book-card-buttons">
                                     <button type="button" class="book-summary-btn" data-book="mockingbird">줄거리</button>
-                                    <button type="button" class="book-select-btn" data-book="mockingbird">보기</button>
+                                    <button type="button" class="book-select-btn view-btn" data-book="mockingbird" data-book-title="To Kill a Mockingbird">보기</button>
                                 </div>
                             </div>
                             <div class="book-summary-popup" id="summary-popup-mockingbird">
@@ -363,7 +362,7 @@
                                 <p class="book-card-genre">Literary Fiction</p>
                                 <div class="book-card-buttons">
                                     <button type="button" class="book-summary-btn" data-book="catcher">줄거리</button>
-                                    <button type="button" class="book-select-btn" data-book="catcher">보기</button>
+                                    <button type="button" class="book-select-btn view-btn" data-book="catcher" data-book-title="The Catcher in the Rye">보기</button>
                                 </div>
                             </div>
                             <div class="book-summary-popup" id="summary-popup-catcher">
@@ -384,7 +383,7 @@
                                 <p class="book-card-genre">Allegory, Satire</p>
                                 <div class="book-card-buttons">
                                     <button type="button" class="book-summary-btn" data-book="animal">줄거리</button>
-                                    <button type="button" class="book-select-btn" data-book="animal">보기</button>
+                                    <button type="button" class="book-select-btn view-btn" data-book="animal" data-book-title="Animal Farm">보기</button>
                                 </div>
                             </div>
                             <div class="book-summary-popup" id="summary-popup-animal">
@@ -412,10 +411,10 @@
                         <aside id="toc-panel" class="reading-panel toc-panel">
                             <h4>목차</h4>
                             <ol class="toc-list">
-                                <li><a href="#chapter-1">Chapter 1. The Clock Strikes</a></li>
-                                <li><a href="#chapter-2">Chapter 2. Ministry of Truth</a></li>
-                                <li><a href="#chapter-3">Chapter 3. Memory and Dreams</a></li>
-                                <li><a href="#chapter-4">Chapter 4. Resistance Notes</a></li>
+                                <li><a href="#chapter-1">Chapter 1</a></li>
+                                <li><a href="#chapter-2">Chapter 2</a></li>
+                                <li><a href="#chapter-3">Chapter 3</a></li>
+                                <li><a href="#chapter-4">Chapter 4</a></li>
                             </ol>
                         </aside>
 
@@ -426,7 +425,7 @@
                                 <button type="button" class="level-btn" data-level="intermediate" aria-selected="false">Intermediate</button>
                                 <button type="button" class="level-btn" data-level="advanced" aria-selected="false">Advanced</button>
                             </div>
-                            <div id="viewer" class="viewer-content">
+                            <div id="original-text-viewer" class="viewer-content">
                                 <article class="viewer-level active" data-level="beginner">
                                     <p class="viewer-text">The morning air felt crisp as Winston opened the window. Sunlight touched the pages of his worn diary, and the quiet street below seemed peaceful for a moment.</p>
                                     <p class="viewer-text">He wrote simple sentences about the day, promising himself to stay hopeful. Even small words carried meaning when they were spoken with care.</p>
@@ -461,7 +460,7 @@
                                 <div class="tools-pane active" data-tab="vocab">
                                     <p>단어장, 문법 분석, 발음 가이드가 실시간으로 제공됩니다.</p>
                                     <button id="generate-vocab-btn" class="btn secondary-btn">단어장 불러오기</button>
-                                    <div id="vocab-list" class="ai-response vocab-list">단어장을 불러오려면 버튼을 눌러주세요.</div>
+                                    <div id="vocab-list" class="ai-response vocab-list">원서 텍스트에서 단어를 클릭하고 즐겨찾기 버튼을 눌러 단어를 저장하세요.</div>
                                 </div>
                                 <div class="tools-pane" data-tab="summary">
                                     <p class="tools-description">선택한 챕터에 대한 요약과 핵심 포인트를 제공합니다.</p>
@@ -528,60 +527,60 @@
                         </button>
                     </header>
                     <div class="community-grid">
-                        <article class="discussion-room" data-category="문학 해석" data-level="beginner" data-book="1984">
+                        <article class="discussion-room" data-category="문학 해석" data-level="beginner" data-book="The Great Gatsby">
                             <div class="room-level-bar">
                                 <span class="room-level-text">Beginner</span>
                             </div>
                             <div class="room-topic">
-                                <h4>Hope and Resistance in Dystopian Worlds</h4>
-                                <div class="room-book-title">1984</div>
-                                <p>주인공이 절망 속에서 희망을 찾는 순간을 중심으로 토론해보세요.</p>
+                                <h4>The American Dream and Its Illusions</h4>
+                                <div class="room-book-title">The Great Gatsby</div>
+                                <p>게츠비의 꿈과 현실의 차이를 중심으로 미국 꿈의 의미를 토론해보세요.</p>
                             </div>
                             <div class="room-meta">
-                                <button class="btn join-btn" data-room="room-hope" data-level="beginner">참여하기</button>
-                                <span class="room-participants">6 / 6</span>
+                                <button class="btn join-btn" data-room="room-gatsby-dream" data-level="beginner">참여하기</button>
+                                <span class="room-participants">3 / 6</span>
                             </div>
                         </article>
-                        <article class="discussion-room" data-category="사회 · 윤리" data-level="intermediate" data-book="1984">
+                        <article class="discussion-room" data-category="사회 · 윤리" data-level="intermediate" data-book="The Great Gatsby">
                             <div class="room-level-bar">
                                 <span class="room-level-text">Intermediate</span>
                             </div>
                             <div class="room-topic">
-                                <h4>Power of Language and Propaganda</h4>
-                                <div class="room-book-title">1984</div>
-                                <p>작품 속 언어 조작 기법이 오늘날 미디어와 어떻게 연결되는지 논의해보세요.</p>
+                                <h4>Social Class and Identity</h4>
+                                <div class="room-book-title">The Great Gatsby</div>
+                                <p>계급과 정체성의 문제를 통해 작품 속 사회 구조를 분석해보세요.</p>
                             </div>
                             <div class="room-meta">
-                                <button class="btn join-btn" data-room="room-language" data-level="intermediate">참여하기</button>
-                                <span class="room-participants">5 / 6</span>
+                                <button class="btn join-btn" data-room="room-gatsby-class" data-level="intermediate">참여하기</button>
+                                <span class="room-participants">4 / 6</span>
                             </div>
                         </article>
-                        <article class="discussion-room" data-category="창의적 글쓰기" data-level="advanced" data-book="To Kill a Mockingbird">
+                        <article class="discussion-room" data-category="문학 해석" data-level="advanced" data-book="The Great Gatsby">
                             <div class="room-level-bar">
                                 <span class="room-level-text">Advanced</span>
                             </div>
                             <div class="room-topic">
-                                <h4>Alternate Ending Challenge</h4>
-                                <div class="room-book-title">To Kill a Mockingbird</div>
-                                <p>같은 설정에서 다른 결말을 상상하며 공동으로 리라이트해보세요.</p>
+                                <h4>Symbolism and Narrative Techniques</h4>
+                                <div class="room-book-title">The Great Gatsby</div>
+                                <p>작품의 상징과 서술 기법을 깊이 있게 분석하고 토론합니다.</p>
                             </div>
                             <div class="room-meta">
-                                <button class="btn join-btn" data-room="room-ending" data-level="advanced">참여하기</button>
-                                <span class="room-participants">4 / 6</span>
+                                <button class="btn join-btn" data-room="room-gatsby-symbol" data-level="advanced">참여하기</button>
+                                <span class="room-participants">2 / 6</span>
                             </div>
                         </article>
-                        <article class="discussion-room" data-category="문학 해석" data-level="intermediate" data-book="1984">
+                        <article class="discussion-room" data-category="문학 해석" data-level="intermediate" data-book="Pride and Prejudice">
                             <div class="room-level-bar">
                                 <span class="room-level-text">Intermediate</span>
                             </div>
                             <div class="room-topic">
-                                <h4>Character Empathy Circle</h4>
-                                <div class="room-book-title">1984</div>
-                                <p>등장인물의 감정과 선택을 공감하며 역할극 형식으로 토론합니다.</p>
+                                <h4>Love, Marriage, and Social Expectations</h4>
+                                <div class="room-book-title">Pride and Prejudice</div>
+                                <p>엘리자베스와 다아시의 관계를 통해 사랑, 결혼, 사회적 기대의 의미를 토론해보세요.</p>
                             </div>
                             <div class="room-meta">
-                                <button class="btn join-btn" data-room="room-empathy" data-level="intermediate">참여하기</button>
-                                <span class="room-participants">6 / 6</span>
+                                <button class="btn join-btn" data-room="room-pride-love" data-level="intermediate">참여하기</button>
+                                <span class="room-participants">5 / 6</span>
                             </div>
                         </article>
                     </div>
@@ -733,7 +732,16 @@
                                     </button>
                                 </div>
                             </div>
-                            <div id="map" style="height: 500px; width: 100%;"></div>
+                            <div id="map" class="map-placeholder" style="height: 500px; width: 100%;">
+                                <div class="map-placeholder-content">
+                                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                        <circle cx="12" cy="10" r="3"></circle>
+                                    </svg>
+                                    <p>지도가 여기에 표시됩니다</p>
+                                    <p class="map-placeholder-subtitle">Google Maps API 또는 다른 지도 서비스를 연동할 수 있습니다</p>
+                                </div>
+                            </div>
                         </div>
                         <aside class="reading-places-sidebar">
                             <div class="sidebar-header">
@@ -1888,8 +1896,10 @@
         window.GoogleGenerativeAI = GoogleGenerativeAI;
         console.log('✅ Google Generative AI SDK 로드 완료');
     </script>
+    <!-- Socket.io 클라이언트 라이브러리 -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <!-- script.js는 SDK 스크립트 로드 후에 실행됨 -->
+    <script src="viewer.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
-

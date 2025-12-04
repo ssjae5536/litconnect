@@ -1,114 +1,9 @@
 /**
- * Spotify Web Playback SDK 로드 완료 전역 콜백 함수
- * SDK가 로드되면 자동으로 이 함수가 호출됩니다.
- * 이 함수 내부에서 initSpotifyPlayer(token)를 호출하여 플레이어 초기화 및 디바이스 연결을 수행합니다.
- * 
- * @param {Object} SDK - Spotify Web Playback SDK 객체
+ * Spotify Web Playback SDK 관련 코드 제거됨
+ * 검색 기능만 사용하므로 플레이어 초기화 불필요
  */
-window.onSpotifyWebPlaybackSDKReady = (SDK) => {
-    console.log('========================================');
-    console.log('✅ Spotify Web Playback SDK가 로드되었습니다.');
-    console.log('========================================');
-    console.log('DEBUG: SDK 객체 타입:', typeof SDK);
-    console.log('DEBUG: SDK 객체:', SDK);
-    
-    // SDK를 전역 변수에 할당
-    window.Spotify = SDK;
-    
-    // SDK 로드 완료 플래그 설정
-    window.spotifySDKReady = true;
-    
-    // 할당 확인
-    console.log('✅ window.Spotify 할당 완료');
-    console.log('  - window.Spotify 타입:', typeof window.Spotify);
-    console.log('  - window.Spotify 존재:', !!window.Spotify);
-    console.log('  - window.spotifySDKReady:', window.spotifySDKReady);
-    console.log('========================================');
-    
-    /**
-     * 저장된 토큰으로 플레이어 초기화 및 디바이스 연결 시도
-     * initSpotifyPlayer 함수가 정의될 때까지 대기한 후 실행
-     */
-    const initializePlayerWithToken = async () => {
-        // initSpotifyPlayer 함수가 정의될 때까지 최대 5초 대기
-        let attempts = 0;
-        const maxAttempts = 50; // 5초 (100ms * 50)
-        
-        while (!window.initSpotifyPlayer && attempts < maxAttempts) {
-            await new Promise(resolve => setTimeout(resolve, 100));
-            attempts++;
-        }
-        
-        if (!window.initSpotifyPlayer) {
-            console.warn('⚠️ initSpotifyPlayer 함수를 찾을 수 없습니다. 나중에 수동으로 초기화해주세요.');
-            return;
-        }
-        
-        // 전역 변수 또는 sessionStorage에서 저장된 토큰 확인
-        const savedToken = window.spotifyAccessToken || sessionStorage.getItem('spotify_access_token');
-        
-        // 토큰 유효성 검증
-        if (!savedToken || typeof savedToken !== 'string' || savedToken.trim() === '') {
-            console.log('ℹ️ 저장된 Spotify 토큰이 없거나 유효하지 않습니다. 로그인이 필요합니다.');
-            return;
-        }
-        
-        // 토큰 만료 시간 확인 (있는 경우)
-        const expiresAt = sessionStorage.getItem('spotify_token_expires_at');
-        if (expiresAt && Date.now() >= parseInt(expiresAt)) {
-            console.warn('⚠️ 저장된 토큰이 만료되었습니다. 다시 로그인해주세요.');
-            // 만료된 토큰 제거
-            window.spotifyAccessToken = null;
-            sessionStorage.removeItem('spotify_access_token');
-            sessionStorage.removeItem('spotify_refresh_token');
-            sessionStorage.removeItem('spotify_token_expires_in');
-            sessionStorage.removeItem('spotify_token_expires_at');
-            return;
-        }
-        
-        // 플레이어가 이미 초기화되어 있는지 확인
-        if (window.spotifyPlayer && window.spotifyDeviceId) {
-            console.log('ℹ️ 플레이어가 이미 초기화되어 있습니다.');
-            return;
-        }
-        
-        // 토큰이 유효하고 플레이어가 초기화되지 않은 경우에만 초기화 시도
-        console.log('✅ 유효한 토큰을 발견했습니다. 플레이어 초기화 및 디바이스 연결 시도...');
-        console.log('DEBUG: 토큰 길이:', savedToken.length);
-        
-        // DOM이 로드될 때까지 대기
-        const waitForDOMAndInit = async () => {
-            if (document.readyState === 'loading') {
-                await new Promise(resolve => {
-                    document.addEventListener('DOMContentLoaded', resolve, { once: true });
-                });
-            }
-            
-            try {
-                // initSpotifyPlayer 함수 호출
-                // 이 함수는 플레이어 초기화 및 디바이스 연결 로직을 포함합니다
-                console.log('🔄 initSpotifyPlayer 함수 호출 시작...');
-                await window.initSpotifyPlayer(savedToken);
-                console.log('✅ 플레이어 초기화 및 디바이스 연결 완료');
-            } catch (error) {
-                console.error('❌ 플레이어 초기화 및 디바이스 연결 실패:', error);
-                console.error('에러 상세:', error.message);
-                console.error('에러 스택:', error.stack);
-            }
-        };
-        
-        // 비동기로 실행 (블로킹하지 않음)
-        waitForDOMAndInit();
-    };
-    
-    // 전역 함수로 노출 (로그인 후 수동 호출 가능)
-    window.initializeSpotifyPlayerIfReady = initializePlayerWithToken;
-    
-    // 플레이어 초기화 시도 (비동기로 실행)
-    initializePlayerWithToken();
-};
 
-const GEMINI_API_KEY = "AIzaSyDjl7Dq8R-FDx7fZevzaFEa1xHj6eGL6s4";
+// Gemini API 키는 서버에서 관리됩니다 (보안상 클라이언트에 노출하지 않음)
 // Gemini 모델 ID: gemini-2.5-flash 사용 (최신 모델)
 const GEMINI_MODEL_ID = "gemini-2.5-flash";
 let activeWordTooltip = null;
@@ -118,11 +13,126 @@ if ('scrollRestoration' in history) {
     history.scrollRestoration = 'manual';
 }
 
+// ============================================
+// Socket.io 실시간 채팅 (전역 변수)
+// ============================================
+let socket = null;
+let currentRoomId = null;
+let currentUsername = 'User'; // 사용자 이름 (나중에 로그인 시스템과 연동)
+
+// ============================================
+// Socket.io 실시간 채팅 함수들
+// ============================================
+
+// 방 입장 시 Socket.io 연결 초기화
+function initializeChatSocket(roomId, username) {
+    // 기존 연결이 있으면 닫기
+    if (socket) {
+        socket.disconnect();
+    }
+    
+    // Socket.io 연결
+    socket = io('http://127.0.0.1:11304', {
+        transports: ['websocket', 'polling']
+    });
+    
+    currentRoomId = roomId;
+    currentUsername = username || 'User';
+    
+    // 연결 성공
+    socket.on('connect', () => {
+        console.log('✅ 채팅 서버에 연결되었습니다.');
+        
+        // 방 입장
+        socket.emit('join-room', roomId, currentUsername);
+    });
+    
+    // 새 메시지 수신
+    socket.on('new-message', (data) => {
+        addMessageToChat(data.username, data.message, data.timestamp, data.socketId === socket.id);
+    });
+    
+    // 사용자 입장 알림
+    socket.on('user-joined', (data) => {
+        // 참여자 수 업데이트
+        const chatRoomMeta = document.getElementById('chat-room-meta');
+        if (chatRoomMeta) {
+            chatRoomMeta.textContent = `실시간 참여 인원 · ${data.roomSize}명`;
+        }
+        
+        // 시스템 메시지 표시 (선택사항)
+        addSystemMessage(data.message);
+    });
+    
+    // 사용자 퇴장 알림
+    socket.on('user-left', (data) => {
+        const chatRoomMeta = document.getElementById('chat-room-meta');
+        if (chatRoomMeta) {
+            chatRoomMeta.textContent = `실시간 참여 인원 · ${data.roomSize}명`;
+        }
+        addSystemMessage(data.message);
+    });
+    
+    // 연결 오류
+    socket.on('connect_error', (error) => {
+        console.error('❌ 채팅 서버 연결 오류:', error);
+        alert('채팅 서버에 연결할 수 없습니다. 페이지를 새로고침해주세요.');
+    });
+}
+
+// 메시지를 채팅에 추가하는 함수
+function addMessageToChat(username, message, timestamp, isOwnMessage) {
+    const chatMessages = document.getElementById('chat-messages');
+    if (!chatMessages) return;
+    
+    const now = timestamp ? new Date(timestamp) : new Date();
+    const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = isOwnMessage ? 'message user' : 'message user-alt';
+    messageDiv.setAttribute('data-timestamp', now.getTime());
+    messageDiv.innerHTML = `
+        <div class="user-meta">${escapeHtml(username)} · ${timeString}</div>
+        <div class="bubble">${escapeHtml(message)}</div>
+    `;
+    
+    chatMessages.appendChild(messageDiv);
+    
+    // 새로 추가된 메시지의 단어를 감싸기 (기존 기능 유지)
+    const newBubble = messageDiv.querySelector('.bubble');
+    if (newBubble && window.wrapWordsInBubble) {
+        window.wrapWordsInBubble(newBubble);
+    }
+    
+    // 스크롤을 맨 아래로
+    requestAnimationFrame(() => {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        setTimeout(() => {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }, 10);
+    });
+}
+
+// 시스템 메시지 추가
+function addSystemMessage(message) {
+    const chatMessages = document.getElementById('chat-messages');
+    if (!chatMessages) return;
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'message bot';
+    messageDiv.innerHTML = `
+        <div class="bubble" style="font-size: 0.9rem; color: #666;">${escapeHtml(message)}</div>
+    `;
+    
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
 // DOM이 로드된 후 실행
 document.addEventListener('DOMContentLoaded', function() {
     const button = document.getElementById('interactive-btn');
     const message = document.getElementById('message');
-    const viewer = document.getElementById('viewer');
+    const viewer = document.getElementById('original-text-viewer');
     const vocabButton = document.getElementById('generate-vocab-btn');
     const levelButtons = document.querySelectorAll('.level-toggle .level-btn');
     const toolsTabButtons = document.querySelectorAll('.tools-tabs .tools-tab-btn');
@@ -172,7 +182,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     .toLowerCase();
 
                 if (cleanedWord) {
-                    console.log('클릭한 순수 단어:', cleanedWord);
                     showWordTooltip(target, cleanedWord);
                     getWordDefinitionFromAI(cleanedWord);
                 }
@@ -199,39 +208,82 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (viewer && levelButtons.length) {
         levelButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', async () => {
                 if (btn.classList.contains('active')) {
                     return;
                 }
 
-                showViewerLevel(btn.dataset.level, viewer, levelButtons);
-                // 레벨 변경 시 현재 챕터 다시 로드
-                const currentChapter = getCurrentChapter();
-                if (currentChapter) {
-                    loadChapterForViewer(currentChapter, btn.dataset.level);
+                const selectedLevel = btn.dataset.level;
+                showViewerLevel(selectedLevel, viewer, levelButtons);
+                currentViewerLevel = selectedLevel;
+                
+                // 레벨 변경 시 목차 업데이트
+                if (currentBookTitle) {
+                    await updateTableOfContents(currentBookTitle, cachedTotalChapters, selectedLevel);
+                    
+                    // 해당 레벨의 첫 번째 챕터 로드
+                    const totalChapters = cachedTotalChapters || 61;
+                    const chapterRange = getChaptersForLevel(selectedLevel, totalChapters);
+                    
+                    if (typeof loadChapter === 'function') {
+                        try {
+                            await loadChapter(currentBookTitle, chapterRange.start);
+                            currentViewerChapter = chapterRange.start;
+                            
+                            const viewerElement = document.getElementById('original-text-viewer');
+                            if (viewerElement) {
+                                viewerElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }
+                        } catch (error) {
+                            console.error('❌ 챕터 로드 오류:', error);
+                        }
+                    }
                 }
             });
         });
     }
 
-    // 목차 챕터 링크 클릭 이벤트
-    const tocLinks = document.querySelectorAll('.toc-list a');
-    tocLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
+    // 목차 챕터 링크 클릭 이벤트는 updateTableOfContents 함수에서 동적으로 추가됩니다.
+    // 초기 목차가 있을 경우를 위한 이벤트 위임 (이벤트 버블링 활용)
+    const tocList = document.querySelector('.toc-list');
+    if (tocList) {
+        tocList.addEventListener('click', async function(e) {
+            const link = e.target.closest('a');
+            if (!link) return;
+            
             e.preventDefault();
-            const href = this.getAttribute('href');
-            // #chapter-1 -> 1 추출
+            const href = link.getAttribute('href');
             const chapterMatch = href.match(/#chapter-(\d+)/);
             if (chapterMatch) {
                 const chapterNumber = parseInt(chapterMatch[1]);
-                // 현재 활성 레벨 확인
-                const activeLevelBtn = document.querySelector('.level-toggle .level-btn.active');
-                const currentLevel = activeLevelBtn ? activeLevelBtn.dataset.level : 'beginner';
-                // 챕터 로드
-                loadChapterForViewer(chapterNumber, currentLevel);
+                
+                if (!currentBookTitle) {
+                    console.warn('⚠️ 책이 선택되지 않았습니다. 먼저 책을 선택해주세요.');
+                    alert('책을 먼저 선택해주세요.');
+                    return;
+                }
+                
+                console.log(`📖 목차에서 챕터 ${chapterNumber} 선택: ${currentBookTitle}`);
+                
+                if (typeof loadChapter === 'function') {
+                    try {
+                        await loadChapter(currentBookTitle, chapterNumber);
+                        currentViewerChapter = chapterNumber;
+                        
+                        const viewerElement = document.getElementById('original-text-viewer');
+                        if (viewerElement) {
+                            viewerElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                    } catch (error) {
+                        console.error('❌ 챕터 로드 오류:', error);
+                        alert(`챕터를 불러오는 중 오류가 발생했습니다: ${error.message}`);
+                    }
+                } else {
+                    console.error('❌ loadChapter 함수를 찾을 수 없습니다.');
+                }
             }
         });
-    });
+    }
 
     // AI 뷰어 페이지가 표시될 때 초기 챕터 로드
     const aiViewerPage = document.getElementById('ai-viewer-page');
@@ -259,20 +311,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (vocabButton && viewer) {
         vocabButton.addEventListener('click', () => {
-            const vocabArea = document.getElementById('vocab-list');
-            if (vocabArea) {
-                vocabArea.innerHTML = '📘 단어장을 준비하는 중입니다...';
-            }
-
-            const words = collectViewerWords(viewer, 12);
-            if (!words.length) {
-                if (vocabArea) {
-                    vocabArea.innerHTML = '⚠️ 단어를 수집할 수 없습니다. 텍스트가 충분한지 확인해주세요.';
-                }
-                return;
-            }
-
-            getVocabularyListFromAI(words);
+            // 저장된 단어장 표시
+            loadSavedVocabulary();
         });
     }
 
@@ -282,8 +322,6 @@ document.addEventListener('DOMContentLoaded', function() {
         summaryButton.addEventListener('click', async () => {
             await fetchSummary();
         });
-    } else {
-        console.warn('⚠️ 줄거리 요약 버튼(id="summary-button")을 찾을 수 없습니다. HTML에 버튼이 정의되어 있는지 확인하세요.');
     }
 
     // 토론 주제 생성 버튼 클릭 이벤트
@@ -301,8 +339,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
                 showToolsTab(btn.dataset.tab, toolsContent, toolsTabButtons);
+                
+                // 단어장 탭이 활성화되면 단어장 표시
+                if (btn.dataset.tab === 'vocab') {
+                    loadSavedVocabulary();
+                }
             });
         });
+        
+        // 초기 로드 시 단어장 탭이 활성화되어 있으면 단어장 표시
+        const activeVocabTab = document.querySelector('.tools-tab-btn[data-tab="vocab"].active');
+        if (activeVocabTab) {
+            loadSavedVocabulary();
+        }
     }
 
     // 저장된 커뮤니티 로드
@@ -457,29 +506,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const newCommunityBookSelect = document.getElementById('new-community-book');
     const newCommunityMaxParticipantsInput = document.getElementById('new-community-max-participants');
     
-    // 읽은 책 목록 가져오기 함수
-    function getReadBooks() {
-        // localStorage에서 읽은 책 목록 가져오기 (최신 순)
-        const readBooks = JSON.parse(localStorage.getItem('readBooks') || '[]');
-        
-        // 기본 책 목록 (예시 데이터)
-        const defaultBooks = [
-            { id: '1984', title: '1984', author: 'George Orwell', completedAt: Date.now() - 86400000 },
-            { id: 'mockingbird', title: 'To Kill a Mockingbird', author: 'Harper Lee', completedAt: Date.now() - 172800000 },
-            { id: 'gatsby', title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', completedAt: Date.now() - 259200000 },
-            { id: 'pride', title: 'Pride and Prejudice', author: 'Jane Austen', completedAt: Date.now() - 345600000 }
-        ];
-        
-        // 읽은 책이 없으면 기본 목록 반환
-        if (readBooks.length === 0) {
-            return defaultBooks;
-        }
-        
-        // 최신 순으로 정렬 (completedAt 기준 내림차순)
-        return readBooks.sort((a, b) => (b.completedAt || 0) - (a.completedAt || 0));
-    }
+    // 읽은 책 목록 가져오기 함수는 전역 스코프에 정의되어 있음 (getReadBooks)
     
-            // 책 선택 드롭다운 로드 함수
+    // 책 선택 드롭다운 로드 함수
     function loadBookSelect() {
         if (!newCommunityBookSelect) return;
         
@@ -504,7 +533,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!newCommunityBookSelect) return true;
         const selectedBook = newCommunityBookSelect.value.trim();
         if (!selectedBook) {
-            alert('책을 선택해주세요.');
             return false;
         }
         return true;
@@ -552,7 +580,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const maxParticipants = newCommunityMaxParticipantsInput ? Math.min(6, Math.max(2, parseInt(newCommunityMaxParticipantsInput.value) || 6)) : 6;
             
             if (!title) {
-                alert('커뮤니티 제목을 입력해주세요.');
                 return;
             }
             
@@ -661,8 +688,16 @@ document.addEventListener('DOMContentLoaded', function() {
         document.addEventListener('click', function(e) {
             const joinBtn = e.target.closest('.join-btn');
             if (joinBtn) {
-                const roomId = joinBtn.dataset.room || 'room-hope';
+                const roomId = joinBtn.dataset.room || 'room-gatsby-dream';
                 const roomLevel = joinBtn.dataset.level || 'beginner';
+                
+                // 사용자 이름 가져오기 (localStorage 또는 입력받기)
+                const username = localStorage.getItem('username') || prompt('이름을 입력하세요:') || 'User';
+                localStorage.setItem('username', username);
+                currentUsername = username;
+                
+                // Socket.io 연결 초기화
+                initializeChatSocket(roomId, username);
                 
                 // localStorage에서 커뮤니티 정보 찾기
                 const communities = JSON.parse(localStorage.getItem('userCommunities') || '[]');
@@ -891,7 +926,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 // 먼저 문자열 직접 전달 시도
                 result = await model.generateContent(prompt);
             } catch (stringError) {
-                console.warn('문자열 직접 전달 실패, 객체 형식으로 재시도:', stringError.message);
                 // 객체 형식으로 재시도
                 result = await model.generateContent({
                     contents: [{
@@ -947,90 +981,48 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
     }
 
-    if (chatBackButton) {
-        chatBackButton.addEventListener('click', () => {
-            showPage('community-page');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-    }
+    // Back 버튼 클릭 시 Socket 연결 해제
+    document.querySelector('.chat-back-btn')?.addEventListener('click', () => {
+        if (socket) {
+            socket.disconnect();
+            socket = null;
+            currentRoomId = null;
+        }
+        showPage('community-page');
+    });
     
-    // 채팅 메시지 전송 함수 (전역에서 접근 가능하도록)
+    // 채팅 메시지 전송 함수 (Socket.io 사용)
     window.sendChatMessage = function() {
-        console.log('sendChatMessage 함수 호출됨');
-        
-        // 1. 입력 필드에서 메시지 텍스트 가져오기
         const chatInput = document.getElementById('chat-input');
-        if (!chatInput) {
-            console.error('❌ chat-input 요소를 찾을 수 없습니다.');
-            alert('입력 필드를 찾을 수 없습니다.');
-            return false;
-        }
+        if (!chatInput) return false;
         
-        // 2. 입력된 텍스트 가져오기 및 검증
         const text = chatInput.value.trim();
-        console.log('입력된 텍스트:', text);
-        if (!text) {
-            console.log('⚠️ 빈 메시지는 전송할 수 없습니다.');
+        if (!text) return false;
+        
+        // Socket.io를 통해 메시지 전송
+        if (socket && socket.connected && currentRoomId) {
+            socket.emit('chat-message', {
+                roomId: currentRoomId,
+                message: text,
+                username: currentUsername,
+                timestamp: Date.now()
+            });
+            
+            // 입력 필드 초기화
+            chatInput.value = '';
+            chatInput.focus();
+            
+            // AI 교정 미리보기 숨기기
+            const chatCorrectionPreview = document.getElementById('ai-correction-preview');
+            if (chatCorrectionPreview) {
+                chatCorrectionPreview.classList.remove('visible');
+            }
+            
+            return true;
+        } else {
+            alert('채팅 서버에 연결되지 않았습니다. 페이지를 새로고침해주세요.');
             return false;
         }
-        
-        // 3. 채팅 메시지 컨테이너 찾기
-        const chatMessages = document.getElementById('chat-messages');
-        if (!chatMessages) {
-            console.error('❌ chat-messages 컨테이너를 찾을 수 없습니다.');
-            alert('채팅 메시지 영역을 찾을 수 없습니다.');
-            return false;
-        }
-        
-        console.log('✅ chat-messages 컨테이너 찾음:', chatMessages);
-        
-        // 4. 현재 시간 생성
-        const now = new Date();
-        const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-        
-        // 5. 새로운 메시지 HTML 요소 생성
-        const messageDiv = document.createElement('div');
-        messageDiv.className = 'message user';
-        messageDiv.setAttribute('data-timestamp', now.getTime());
-        messageDiv.innerHTML = `
-            <div class="user-meta">You · ${timeString}</div>
-            <div class="bubble">${escapeHtml(text)}</div>
-        `;
-        
-        console.log('메시지 요소 생성됨:', messageDiv);
-        
-        // 6. 화면 업데이트: 채팅 목록 컨테이너에 메시지 추가 (Append)
-        chatMessages.appendChild(messageDiv);
-        console.log('✅ 메시지가 화면에 추가되었습니다:', text);
-        console.log('현재 메시지 개수:', chatMessages.children.length);
-        
-        // 6-1. 새로 추가된 메시지의 단어를 감싸기
-        const newBubble = messageDiv.querySelector('.bubble');
-        if (newBubble && window.wrapWordsInBubble) {
-            window.wrapWordsInBubble(newBubble);
-        }
-        
-        // 7. 스크롤을 맨 아래로 이동
-        requestAnimationFrame(() => {
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-            setTimeout(() => {
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }, 10);
-        });
-        
-        // 8. 입력창 초기화: 메시지 전송 후 입력 필드 내용 지우기
-        chatInput.value = '';
-        chatInput.focus();
-        
-        // 9. AI 교정 미리보기 숨기기
-        const chatCorrectionPreview = document.getElementById('ai-correction-preview');
-        if (chatCorrectionPreview) {
-            chatCorrectionPreview.classList.remove('visible');
-        }
-        
-        console.log('✅ 입력 필드가 초기화되었습니다.');
-        
-        return true;
     };
     
     // 전송 버튼 클릭 이벤트 (type="button"으로 변경했으므로 클릭 이벤트만 처리)
@@ -1042,7 +1034,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (form && (form.id === 'chat-input-form' || form.classList.contains('chat-input-area'))) {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('📤 전송 버튼 클릭');
                 window.sendChatMessage();
             }
         }
@@ -1054,7 +1045,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (form && (form.id === 'chat-input-form' || form.classList.contains('chat-input-area'))) {
             e.preventDefault();
             e.stopPropagation();
-            console.log('📤 Form submit 이벤트 발생');
             window.sendChatMessage();
         }
     }, true);
@@ -1065,7 +1055,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (chatInput && document.activeElement === chatInput) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                console.log('📤 Enter 키로 전송');
                 window.sendChatMessage();
             }
         }
@@ -1153,9 +1142,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-    // 페이지 로드 시 환영 메시지
-    console.log('LitConnect 프로젝트가 로드되었습니다!');
-    console.log('HTML, CSS, JavaScript 파일이 모두 연결되었습니다.');
 });
 
 function prepareViewerWords(viewerElement) {
@@ -1203,7 +1189,6 @@ async function getWordDefinitionFromAI(word) {
     const responseArea = document.getElementById('ai-response-area');
 
     if (!responseArea) {
-        console.warn('AI response area not found.');
         return;
     }
 
@@ -1243,7 +1228,6 @@ async function getWordDefinitionFromAI(word) {
 
         if (!result || !result.response) {
             responseArea.innerHTML = '❌ 오류: 예상치 못한 응답 형식입니다. 콘솔을 확인하세요.';
-            console.warn('Unexpected response format:', result);
             return;
         }
 
@@ -1302,83 +1286,292 @@ function showFallbackDefinition(word, responseArea, error) {
     }
 }
 
+// 단어를 단어장에 저장하는 함수
+function saveWordToVocabulary(wordData) {
+    const savedWords = JSON.parse(localStorage.getItem('savedVocabulary') || '[]');
+    const wordKey = wordData.word.toLowerCase().trim();
+    
+    // 중복 확인
+    const existingIndex = savedWords.findIndex(w => w.word && w.word.toLowerCase().trim() === wordKey);
+    
+    if (existingIndex >= 0) {
+        // 이미 존재하면 업데이트
+        savedWords[existingIndex] = {
+            ...wordData,
+            savedAt: Date.now()
+        };
+    } else {
+        // 새로 추가
+        savedWords.push({
+            ...wordData,
+            savedAt: Date.now()
+        });
+    }
+    
+    localStorage.setItem('savedVocabulary', JSON.stringify(savedWords));
+    console.log('✅ 단어가 단어장에 저장되었습니다:', wordData.word);
+    
+    // 단어장이 열려있으면 새로고침
+    const vocabArea = document.getElementById('vocab-list');
+    if (vocabArea && vocabArea.innerHTML.includes('단어장')) {
+        loadSavedVocabulary();
+    }
+}
+
+// 단어를 단어장에서 제거하는 함수
+function removeWordFromVocabulary(word) {
+    const savedWords = JSON.parse(localStorage.getItem('savedVocabulary') || '[]');
+    const wordKey = word.toLowerCase().trim();
+    
+    const filteredWords = savedWords.filter(w => {
+        const wKey = w.word ? w.word.toLowerCase().trim() : '';
+        return wKey !== wordKey;
+    });
+    
+    localStorage.setItem('savedVocabulary', JSON.stringify(filteredWords));
+    console.log('✅ 단어가 단어장에서 제거되었습니다:', word);
+    
+    // 단어장이 열려있으면 새로고침
+    const vocabArea = document.getElementById('vocab-list');
+    if (vocabArea && vocabArea.innerHTML.includes('단어장')) {
+        loadSavedVocabulary();
+    }
+}
+
+// 전역 스코프에 함수 노출 (viewer.js에서 사용)
+window.saveWordToVocabulary = saveWordToVocabulary;
+window.removeWordFromVocabulary = removeWordFromVocabulary;
+window.loadSavedVocabulary = loadSavedVocabulary;
+
+// 저장된 단어장을 표시하는 함수
+function loadSavedVocabulary() {
+    const vocabArea = document.getElementById('vocab-list');
+    if (!vocabArea) {
+        return;
+    }
+    
+    const savedWords = JSON.parse(localStorage.getItem('savedVocabulary') || '[]');
+    
+    if (savedWords.length === 0) {
+        vocabArea.innerHTML = `
+            <div style="text-align: center; padding: 40px 20px; color: #666;">
+                <p style="font-size: 1.1rem; margin-bottom: 10px;">📘 단어장이 비어있습니다</p>
+                <p style="font-size: 0.9rem; color: #999;">원서 텍스트에서 단어를 클릭하고 즐겨찾기 버튼을 눌러 단어를 저장하세요.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // 최신 순으로 정렬
+    const sortedWords = savedWords.sort((a, b) => (b.savedAt || 0) - (a.savedAt || 0));
+    
+    const wordsList = sortedWords.map((wordData, index) => {
+        const savedDate = new Date(wordData.savedAt || Date.now());
+        const dateStr = savedDate.toLocaleDateString('ko-KR', { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric' 
+        });
+        
+        return `
+            <div class="vocab-word-item" data-word-index="${index}" style="padding: 16px; margin-bottom: 12px; background: #f9f9f9; border-radius: 8px; border-left: 3px solid #4a90e2; position: relative;">
+                <button 
+                    class="delete-vocab-word-btn" 
+                    data-word="${escapeHtml(wordData.word || '')}"
+                    style="position: absolute; top: 12px; right: 12px; background: #ffffff; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; color: #000000; padding: 0;"
+                    title="단어 삭제"
+                >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                </button>
+                <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: bold; color: #333; padding-right: 40px;">
+                    ⭐ ${escapeHtml(wordData.word || '단어')}
+                </h3>
+                <p style="margin: 0 0 6px 0; font-size: 14px; color: #666;">
+                    <strong>발음</strong>: ${escapeHtml(wordData.pronunciation || '발음 정보 없음')}
+                </p>
+                <p style="margin: 0 0 6px 0; font-size: 14px; color: #666;">
+                    <strong>뜻</strong>: ${escapeHtml(wordData.meaning || '의미 정보 없음')}
+                </p>
+                <p style="margin: 0 0 6px 0; font-size: 14px; color: #666;">
+                    <strong>예문</strong>: ${escapeHtml(wordData.example || '예문 정보 없음')}
+                </p>
+                <small style="color: #999; font-size: 12px;">저장일: ${dateStr}</small>
+            </div>
+        `;
+    }).join('');
+    
+    vocabArea.innerHTML = `
+        <h2 style="margin-bottom: 16px; font-size: 20px; color: #333;">📘 내 단어장 (${savedWords.length}개)</h2>
+        <div class="vocab-words-container">
+            ${wordsList}
+        </div>
+    `;
+    
+    // 삭제 버튼 이벤트 리스너 추가
+    const deleteButtons = vocabArea.querySelectorAll('.delete-vocab-word-btn');
+    deleteButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const word = btn.dataset.word;
+            if (confirm(`"${word}" 단어를 단어장에서 삭제하시겠습니까?`)) {
+                removeWordFromVocabulary(word);
+                loadSavedVocabulary();
+            }
+        });
+        
+        // 호버 효과
+        btn.addEventListener('mouseenter', () => {
+            btn.style.background = '#f5f5f5';
+            btn.style.transform = 'scale(1.1)';
+        });
+        
+        btn.addEventListener('mouseleave', () => {
+            btn.style.background = '#ffffff';
+            btn.style.transform = 'scale(1)';
+        });
+    });
+}
+
 async function getVocabularyListFromAI(words) {
     const vocabArea = document.getElementById('vocab-list');
 
     if (!vocabArea) {
-        console.warn('Vocabulary area not found.');
         return;
     }
 
     vocabArea.innerHTML = '📘 AI가 단어장을 작성하는 중입니다...';
 
     try {
-        const model = createGeminiModel();
-        if (!model) {
-            vocabArea.innerHTML = '❌ 에러: Google Gen AI SDK를 로드하지 못했습니다. index.html을 확인해주세요.';
-            return;
+        // 서버의 /api/vocabulary 엔드포인트 호출
+        const response = await fetch('http://127.0.0.1:11304/api/vocabulary', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include', // 세션 쿠키를 포함
+            body: JSON.stringify({
+                words: words
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            
+            // 403 오류 (API 키 유출) 처리
+            if (response.status === 403) {
+                vocabArea.innerHTML = `
+                    <p style="color: #ff6b6b;">❌ Gemini API 키가 유출되어 차단되었습니다.</p>
+                    <p style="color: #666; font-size: 0.9rem; margin-top: 10px;">
+                        새로운 API 키를 발급받아 서버의 .env 파일에 설정해주세요.<br>
+                        <a href="https://aistudio.google.com/apikey" target="_blank" style="color: #4a90e2; text-decoration: underline;">
+                            Google AI Studio에서 새 API 키 발급받기
+                        </a>
+                    </p>
+                `;
+                return;
+            }
+            
+            throw new Error(errorData.message || `서버 오류: ${response.status}`);
         }
 
-        const prompt = `당신은 영어 학습을 돕는 튜터입니다. 아래의 단어 목록을 참고하여 학습용 단어장을 만들어 주세요.
+        const data = await response.json();
 
-단어 목록: ${words.join(', ')}
+        if (data.success && data.vocabulary) {
+            // 인사말 및 불필요한 설명 제거
+            let text = data.vocabulary
+                .replace(/^.*?안녕하세요[^]*?요청하신[^]*?궁금한 점[^]*?질문해주세요[^]*?---/gi, '') // 인사말 제거
+                .replace(/^.*?영어 학습 튜터입니다[^]*?---/gi, '') // 설명 제거
+                .replace(/^.*?---\s*/g, '') // 구분선 제거
+                .replace(/^\s*📝\s*AI\s*단어장\s*\n*/i, '') // 제목 제거
+                .trim();
 
-**중요: 인사말, 설명, 소개 문구 없이 바로 단어장 내용만 출력하세요.**
-
-각 단어에 대해 다음 정보를 한국어로 제공하세요:
-- 단어 (원문 그대로)
-- 발음 (IPA 혹은 쉬운 표기)
-- 핵심 의미 (간단 명확)
-- 예문 (영어 문장 1개와 한국어 번역 1개)
-
-출력 형식은 보기 좋게 번호를 붙여 정리해주세요. 인사말이나 "안녕하세요", "요청하신", "궁금한 점" 같은 문구는 절대 포함하지 마세요.`;
-
-        // generateContent 호출 (안전한 형식 사용)
-        // 최신 SDK에서는 문자열 직접 전달 또는 객체 형식 모두 지원
-        let result;
-        try {
-            // 먼저 문자열 직접 전달 시도
-            result = await model.generateContent(prompt);
-        } catch (stringError) {
-            console.warn('문자열 직접 전달 실패, 객체 형식으로 재시도:', stringError.message);
-            // 객체 형식으로 재시도
-            result = await model.generateContent({
-                contents: [{
-                    role: 'user',
-                    parts: [{ text: prompt }],
-                }],
-            });
+            const formattedResponse = formatAIResponse(text);
+            vocabArea.innerHTML = `<h2>📝 AI 단어장</h2>${formattedResponse}`;
+        } else {
+            throw new Error('단어장 결과를 받을 수 없습니다.');
         }
-
-        if (!result || !result.response) {
-            vocabArea.innerHTML = '❌ 오류: 예상치 못한 응답 형식입니다. 콘솔을 확인하세요.';
-            console.warn('Unexpected response format (vocab):', result);
-            return;
-        }
-
-        // 최신 SDK에서는 response.text()가 함수이거나 직접 속성일 수 있음
-        let text = typeof result.response.text === 'function' 
-            ? result.response.text() 
-            : (result.response.text || result.response.candidates?.[0]?.content?.parts?.[0]?.text || '');
-
-        // 인사말 및 불필요한 설명 제거
-        text = text
-            .replace(/^.*?안녕하세요[^]*?요청하신[^]*?궁금한 점[^]*?질문해주세요[^]*?---/gi, '') // 인사말 제거
-            .replace(/^.*?영어 학습 튜터입니다[^]*?---/gi, '') // 설명 제거
-            .replace(/^.*?---\s*/g, '') // 구분선 제거
-            .replace(/^\s*📝\s*AI\s*단어장\s*\n*/i, '') // 제목 제거
-            .trim();
-
-        const formattedResponse = formatAIResponse(text);
-        vocabArea.innerHTML = `<h2>📝 AI 단어장</h2>${formattedResponse}`;
     } catch (error) {
         console.error('Gemini API 단어장 생성 중 오류 발생:', error);
-        vocabArea.innerHTML = '❌ 오류 발생: 단어장을 가져오는 데 실패했습니다. 콘솔을 확인해주세요.';
+        
+        vocabArea.innerHTML = `❌ 오류 발생: 단어장을 가져오는 데 실패했습니다. ${escapeHtml(error.message)}`;
         showFallbackVocabulary(words, vocabArea, error);
     }
 }
 
 function collectViewerWords(viewerElement, limit = 12) {
+    if (!viewerElement) {
+        return [];
+    }
+    
+    // viewer.js의 loadChapter가 생성한 .word 요소들에서 단어 수집
+    // .chapter-text div 내부의 .word 요소도 포함하여 검색
+    const wordElements = viewerElement.querySelectorAll('.word');
+    
+    // .chapter-text div 내부에서도 시도
+    const chapterTextDiv = viewerElement.querySelector('.chapter-text');
+    if (chapterTextDiv) {
+        const wordsInChapterText = chapterTextDiv.querySelectorAll('.word');
+        
+        if (wordsInChapterText.length > 0) {
+            const textContent = Array.from(wordsInChapterText)
+                .map(el => el.textContent.trim())
+                .join(' ')
+                .toLowerCase();
+
+            const tokens = textContent.match(/[a-z']+/g);
+            if (!tokens) {
+                return [];
+            }
+
+            const stopWords = new Set([
+                'the', 'and', 'is', 'was', 'were', 'in', 'on', 'at', 'to', 'a', 'an', 'of', 'for',
+                'with', 'as', 'by', 'it', 'this', 'that', 'from', 'be', 'or', 'but', 'are', 'his',
+                'her', 'their', 'he', 'she', 'they', 'we', 'you', 'i'
+            ]);
+
+            const uniqueWords = [];
+            tokens.forEach(token => {
+                if (!stopWords.has(token) && !uniqueWords.includes(token)) {
+                    uniqueWords.push(token);
+                }
+            });
+
+            return uniqueWords.slice(0, limit);
+        }
+    }
+    
+    if (wordElements.length > 0) {
+        // .word 요소가 있으면 (viewer.js로 로드된 경우)
+        const textContent = Array.from(wordElements)
+            .map(el => el.textContent.trim())
+            .join(' ')
+            .toLowerCase();
+
+        const tokens = textContent.match(/[a-z']+/g);
+        if (!tokens) {
+            return [];
+        }
+
+        const stopWords = new Set([
+            'the', 'and', 'is', 'was', 'were', 'in', 'on', 'at', 'to', 'a', 'an', 'of', 'for',
+            'with', 'as', 'by', 'it', 'this', 'that', 'from', 'be', 'or', 'but', 'are', 'his',
+            'her', 'their', 'he', 'she', 'they', 'we', 'you', 'i'
+        ]);
+
+        const uniqueWords = [];
+        tokens.forEach(token => {
+            if (!stopWords.has(token) && !uniqueWords.includes(token)) {
+                uniqueWords.push(token);
+            }
+        });
+
+        return uniqueWords.slice(0, limit);
+    }
+
+    // 기존 방식: .viewer-level.active와 .viewer-text 구조 (하위 호환성)
     const activeLevel = viewerElement.querySelector('.viewer-level.active');
     if (!activeLevel) {
         return [];
@@ -1431,6 +1624,13 @@ function showFallbackVocabulary(words, vocabArea, error) {
 }
 
 function createGeminiModel() {
+    // 보안상 클라이언트에서 직접 Gemini API를 호출하지 않습니다.
+    // 모든 Gemini API 호출은 서버를 통해 이루어집니다.
+    console.warn('⚠️ 클라이언트에서 직접 Gemini API를 호출할 수 없습니다. 서버를 통해 호출해주세요.');
+    return null;
+    
+    // 아래 코드는 보안상 비활성화되었습니다.
+    /*
     // GoogleGenerativeAI 확인
     if (!window.GoogleGenerativeAI) {
         console.error('Google Generative AI SDK가 로드되지 않았습니다.');
@@ -1445,7 +1645,6 @@ function createGeminiModel() {
         
         console.log('🔄 Gemini 모델 생성 시도:', GEMINI_MODEL_ID);
         console.log('DEBUG: GoogleGenerativeAI 인스턴스:', !!genAI);
-        console.log('DEBUG: API 키 길이:', GEMINI_API_KEY?.length);
         
         // 모델 가져오기 (기본 설정 사용)
         const model = genAI.getGenerativeModel({ 
@@ -1485,6 +1684,7 @@ function createGeminiModel() {
         
         return null;
     }
+    */
 }
 
 function formatAIResponse(markdown = '') {
@@ -1576,6 +1776,31 @@ function escapeHtml(str = '') {
         .replace(/'/g, '&#39;');
 }
 
+/**
+ * 읽은 책 목록을 가져오는 전역 함수
+ * @returns {Array} 읽은 책 목록
+ */
+function getReadBooks() {
+    // localStorage에서 읽은 책 목록 가져오기 (최신 순)
+    const readBooks = JSON.parse(localStorage.getItem('readBooks') || '[]');
+    
+    // 기본 책 목록 (예시 데이터)
+    const defaultBooks = [
+        { id: '1984', title: '1984', author: 'George Orwell', completedAt: Date.now() - 86400000 },
+        { id: 'mockingbird', title: 'To Kill a Mockingbird', author: 'Harper Lee', completedAt: Date.now() - 172800000 },
+        { id: 'gatsby', title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', completedAt: Date.now() - 259200000 },
+        { id: 'pride', title: 'Pride and Prejudice', author: 'Jane Austen', completedAt: Date.now() - 345600000 }
+    ];
+    
+    // 읽은 책이 없으면 기본 목록 반환
+    if (readBooks.length === 0) {
+        return defaultBooks;
+    }
+    
+    // 최신 순으로 정렬 (completedAt 기준 내림차순)
+    return readBooks.sort((a, b) => (b.completedAt || 0) - (a.completedAt || 0));
+}
+
 function showPage(pageId) {
     const pages = document.querySelectorAll('[id$="-page"]');
     pages.forEach(page => {
@@ -1594,6 +1819,11 @@ function showPage(pageId) {
         // 지도 페이지가 표시될 때 Google Maps API 로드
         if (pageId === 'map-page') {
             loadGoogleMapsAPI();
+        }
+        
+        // 마이페이지가 표시될 때 독서 기록 불러오기
+        if (pageId === 'mypage-page') {
+            loadReadingRecords();
         }
     }
 }
@@ -1644,15 +1874,179 @@ window.addEventListener('load', function() {
 
 // 현재 선택된 챕터 번호를 저장하는 변수
 let currentViewerChapter = 1;
+let currentBookTitle = null; // 현재 선택된 책 제목 저장
+let currentViewerLevel = 'beginner'; // 현재 선택된 레벨 저장
+let cachedTotalChapters = null; // 캐시된 총 챕터 수
 
 // 현재 챕터 번호 가져오기
 function getCurrentChapter() {
     return currentViewerChapter;
 }
 
+// 레벨별 챕터 범위 정의 함수
+function getChaptersForLevel(level, totalChapters) {
+    // The Great Gatsby는 총 9챕터로 레벨당 3개씩 구성
+    if (totalChapters === 9) {
+        switch(level) {
+            case 'beginner':
+                return { start: 1, end: 3 };
+            case 'intermediate':
+                return { start: 4, end: 6 };
+            case 'advanced':
+                return { start: 7, end: 9 };
+            default:
+                return { start: 1, end: 3 };
+        }
+    }
+    
+    // 다른 책들은 총 챕터 수를 3등분 (예: 61챕터 -> Beginner: 1-20, Intermediate: 21-40, Advanced: 41-61)
+    const chunkSize = Math.ceil(totalChapters / 3);
+    
+    switch(level) {
+        case 'beginner':
+            return { start: 1, end: chunkSize };
+        case 'intermediate':
+            return { start: chunkSize + 1, end: chunkSize * 2 };
+        case 'advanced':
+            return { start: chunkSize * 2 + 1, end: totalChapters };
+        default:
+            return { start: 1, end: chunkSize };
+    }
+}
+
+// 목차에 책 이름 업데이트 및 동적 생성 함수 (레벨별 필터링)
+async function updateTableOfContents(bookTitle, totalChapters = null, level = null) {
+    const tocList = document.querySelector('.toc-list');
+    if (!tocList) return;
+    
+    // 현재 선택된 레벨 가져오기
+    if (!level) {
+        const activeLevelBtn = document.querySelector('.level-toggle .level-btn.active');
+        level = activeLevelBtn ? activeLevelBtn.dataset.level : 'beginner';
+    }
+    currentViewerLevel = level;
+    
+    // total_chapters가 제공되지 않으면 첫 번째 챕터를 로드해서 가져오기
+    if (!totalChapters && bookTitle) {
+        // 캐시된 값이 있으면 사용
+        if (cachedTotalChapters) {
+            totalChapters = cachedTotalChapters;
+        } else {
+            // The Great Gatsby인 경우 JSON 파일에서 직접 읽기
+            if (bookTitle === 'The Great Gatsby' || bookTitle === 'The_Great_Gatsby' || bookTitle.includes('Gatsby')) {
+                try {
+                    // 절대 경로 사용
+                    const jsonUrl = window.location.origin + '/data/The_Great_Gatsby_chapters.json';
+                    const jsonResponse = await fetch(jsonUrl);
+                    if (jsonResponse.ok) {
+                        const jsonData = await jsonResponse.json();
+                        totalChapters = jsonData.total_chapters || jsonData.chapters.length;
+                        cachedTotalChapters = totalChapters;
+                        console.log(`✅ The Great Gatsby 챕터 수: ${totalChapters} (JSON 파일에서)`);
+                    } else {
+                        totalChapters = 10; // 기본값 (The Great Gatsby)
+                        cachedTotalChapters = 10;
+                        console.warn(`⚠️ JSON 파일 로드 실패 (HTTP ${jsonResponse.status}), 기본값 10 사용`);
+                    }
+                } catch (error) {
+                    console.error('❌ JSON 파일 로드 오류:', error);
+                    totalChapters = 10; // 기본값 (The Great Gatsby)
+                    cachedTotalChapters = 10;
+                }
+            } else {
+                // 기존 API 방식 (다른 책들)
+                try {
+                    const encodedBookTitle = encodeURIComponent(bookTitle);
+                    const response = await fetch(`http://localhost:11304/api/book/chapter/${encodedBookTitle}/1`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        // 서버 응답에서 total_chapters 가져오기
+                        totalChapters = data.total_chapters || 61; // 기본값 61 (Pride and Prejudice)
+                        cachedTotalChapters = totalChapters; // 캐시에 저장
+                    }
+                } catch (error) {
+                    totalChapters = 61; // 기본값 (Pride and Prejudice)
+                    cachedTotalChapters = 61;
+                }
+            }
+        }
+    }
+    
+    // totalChapters가 없으면 기본값 61 사용 (Pride and Prejudice)
+    if (!totalChapters) {
+        totalChapters = 61;
+        cachedTotalChapters = 61;
+    }
+    
+    // 레벨별 챕터 범위 가져오기
+    const chapterRange = getChaptersForLevel(level, totalChapters);
+    
+    // 기존 목차 제거
+    tocList.innerHTML = '';
+    
+    // 해당 레벨의 챕터만 목차에 추가
+    for (let i = chapterRange.start; i <= chapterRange.end; i++) {
+        const listItem = document.createElement('li');
+        const link = document.createElement('a');
+        link.href = `#chapter-${i}`;
+        link.textContent = `${String(i).padStart(2, '0')}. Chapter ${i} ${bookTitle ? `[${bookTitle}]` : ''}`;
+        listItem.appendChild(link);
+        tocList.appendChild(listItem);
+    }
+    
+    // 목차 링크에 클릭 이벤트 다시 추가
+    const tocLinks = document.querySelectorAll('.toc-list a');
+    tocLinks.forEach(link => {
+        // 기존 이벤트 리스너 제거를 위해 클론
+        const newLink = link.cloneNode(true);
+        link.parentNode.replaceChild(newLink, link);
+        
+        newLink.addEventListener('click', async function(e) {
+            e.preventDefault();
+            const href = this.getAttribute('href');
+            const chapterMatch = href.match(/#chapter-(\d+)/);
+            if (chapterMatch) {
+                const chapterNumber = parseInt(chapterMatch[1]);
+                
+                if (!currentBookTitle) {
+                    console.warn('⚠️ 책이 선택되지 않았습니다. 먼저 책을 선택해주세요.');
+                    alert('책을 먼저 선택해주세요.');
+                    return;
+                }
+                
+                // 선택한 챕터가 현재 레벨 범위에 있는지 확인
+                const currentRange = getChaptersForLevel(currentViewerLevel, totalChapters);
+                if (chapterNumber < currentRange.start || chapterNumber > currentRange.end) {
+                    alert(`이 챕터는 ${currentViewerLevel} 레벨에서 사용할 수 없습니다.`);
+                    return;
+                }
+                
+                console.log(`📖 목차에서 챕터 ${chapterNumber} 선택: ${currentBookTitle} (${currentViewerLevel} 레벨)`);
+                
+                if (typeof loadChapter === 'function') {
+                    try {
+                        await loadChapter(currentBookTitle, chapterNumber);
+                        currentViewerChapter = chapterNumber;
+                        
+                        const viewerElement = document.getElementById('original-text-viewer');
+                        if (viewerElement) {
+                            viewerElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                    } catch (error) {
+                        console.error('❌ 챕터 로드 오류:', error);
+                        alert(`챕터를 불러오는 중 오류가 발생했습니다: ${error.message}`);
+                    }
+                } else {
+                    console.error('❌ loadChapter 함수를 찾을 수 없습니다.');
+                }
+            }
+        });
+    });
+}
+
 // AI 뷰어에 챕터 내용 로드
 function loadChapterForViewer(chapterNumber, level) {
-    const viewer = document.getElementById('viewer');
+    const viewer = document.getElementById('original-text-viewer');
     if (!viewer) return;
 
     const chapterData = chapterTexts[chapterNumber] || chapterTexts[1];
@@ -1824,29 +2218,33 @@ function getDummyTooltipData(word) {
 
 function getCommunityRoomInfo(roomId) {
     const rooms = {
-        'room-hope': {
-            title: 'Hope and Resistance in Dystopian Worlds',
-            meta: '실시간 참여 인원 · 6명',
-            level: 'beginner'
+        'room-gatsby-dream': {
+            title: 'The American Dream and Its Illusions',
+            meta: '실시간 참여 인원 · 3명',
+            level: 'beginner',
+            book: 'The Great Gatsby'
         },
-        'room-language': {
-            title: 'Power of Language and Propaganda',
-            meta: '실시간 참여 인원 · 8명',
-            level: 'intermediate'
-        },
-        'room-ending': {
-            title: 'Alternate Ending Challenge',
+        'room-gatsby-class': {
+            title: 'Social Class and Identity',
             meta: '실시간 참여 인원 · 4명',
-            level: 'advanced'
+            level: 'intermediate',
+            book: 'The Great Gatsby'
         },
-        'room-empathy': {
-            title: 'Character Empathy Circle',
-            meta: '실시간 참여 인원 · 7명',
-            level: 'intermediate'
+        'room-gatsby-symbol': {
+            title: 'Symbolism and Narrative Techniques',
+            meta: '실시간 참여 인원 · 2명',
+            level: 'advanced',
+            book: 'The Great Gatsby'
+        },
+        'room-pride-love': {
+            title: 'Love, Marriage, and Social Expectations',
+            meta: '실시간 참여 인원 · 5명',
+            level: 'intermediate',
+            book: 'Pride and Prejudice'
         }
     };
 
-    return rooms[roomId] || rooms['room-hope'];
+    return rooms[roomId] || rooms['room-gatsby-dream'];
 }
 
 // 원문 참조 패널에 레벨에 맞는 원서 로드
@@ -1916,10 +2314,12 @@ const chapterTexts = {
 
 // 현재 원문 참조 패널의 레벨을 저장하는 전역 변수
 let currentReferenceLevel = 'beginner';
+let currentReferenceBook = null; // 현재 참조 중인 책 제목
 
-function loadOriginalTextForRoom(roomId, level) {
+async function loadOriginalTextForRoom(roomId, level) {
     const referencePassage = document.getElementById('reference-passage');
     const referencePanelContent = document.getElementById('reference-panel-content');
+    const referencePanel = document.getElementById('reference-panel');
     const referenceLevelContents = document.querySelectorAll('.reference-level-content');
     const referenceLevelToggle = document.querySelector('.reference-level-toggle');
     const chapterSelect = document.getElementById('reference-chapter-select');
@@ -1929,29 +2329,97 @@ function loadOriginalTextForRoom(roomId, level) {
     // 현재 레벨 저장
     currentReferenceLevel = level;
     
-    // 기본 챕터는 1번
-    const currentChapter = chapterSelect ? parseInt(chapterSelect.value) || 1 : 1;
-    const chapterData = chapterTexts[currentChapter] || chapterTexts[1];
-    const texts = chapterData[level] || chapterData.beginner;
+    // 토론방의 책 정보 가져오기
+    const communities = JSON.parse(localStorage.getItem('userCommunities') || '[]');
+    const userCommunity = communities.find(c => c.id === roomId);
+    const roomInfo = getCommunityRoomInfo(roomId);
+    const bookTitle = (userCommunity && userCommunity.book) || (roomInfo && roomInfo.book);
     
-    // 기본 패널 콘텐츠 업데이트 (해당 레벨의 내용만)
-    referencePassage.innerHTML = texts.map(text => `<p class="reference-text">${text}</p>`).join('');
-    
-    // 확장 패널의 레벨별 콘텐츠 업데이트 (해당 레벨만 표시)
-    referenceLevelContents.forEach(content => {
-        const contentLevel = content.dataset.level;
-        if (contentLevel === level) {
-            // 해당 레벨만 active로 설정하고 표시
-            content.classList.add('active');
-            content.style.display = 'block';
-            const chapterTextsForLevel = chapterData[contentLevel] || [];
-            content.innerHTML = chapterTextsForLevel.map(text => `<p class="reference-text">${text}</p>`).join('');
-        } else {
-            // 다른 레벨은 숨기기
-            content.classList.remove('active');
-            content.style.display = 'none';
+    // 책 정보가 없으면 원문 참조 패널 숨기기
+    if (!bookTitle) {
+        if (referencePanel) {
+            referencePanel.style.display = 'none';
         }
-    });
+        return;
+    }
+    
+    currentReferenceBook = bookTitle;
+    
+    // The Great Gatsby는 JSON 파일에서 로드, 다른 책은 MongoDB에서 확인
+    let bookExists = false;
+    let totalChapters = 61; // 기본값
+    
+    if (bookTitle === 'The Great Gatsby' || bookTitle.includes('Gatsby')) {
+        // The Great Gatsby는 JSON 파일에서 로드
+        try {
+            const jsonUrl = window.location.origin + '/data/The_Great_Gatsby_chapters.json';
+            const jsonResponse = await fetch(jsonUrl);
+            if (jsonResponse.ok) {
+                const jsonData = await jsonResponse.json();
+                bookExists = true;
+                totalChapters = jsonData.total_chapters || 9;
+            } else {
+                // JSON 파일이 없으면 원문 참조 패널 숨기기
+                if (referencePanel) {
+                    referencePanel.style.display = 'none';
+                }
+                return;
+            }
+        } catch (error) {
+            console.error('The Great Gatsby JSON 파일 로드 실패:', error);
+            if (referencePanel) {
+                referencePanel.style.display = 'none';
+            }
+            return;
+        }
+    } else {
+        // 다른 책들은 MongoDB에서 확인
+        try {
+            const encodedBookTitle = encodeURIComponent(bookTitle);
+            const response = await fetch(`http://localhost:11304/api/book/chapter/${encodedBookTitle}/1`);
+            if (response.ok) {
+                const data = await response.json();
+                bookExists = true;
+                totalChapters = data.total_chapters || 61;
+            } else {
+                // 책이 존재하지 않으면 원문 참조 패널 숨기기
+                if (referencePanel) {
+                    referencePanel.style.display = 'none';
+                }
+                return;
+            }
+        } catch (error) {
+            console.error('총 챕터 수 가져오기 실패:', error);
+            // 오류 발생 시 원문 참조 패널 숨기기
+            if (referencePanel) {
+                referencePanel.style.display = 'none';
+            }
+            return;
+        }
+    }
+    
+    // 책이 존재하면 원문 참조 패널 표시
+    if (referencePanel) {
+        referencePanel.style.display = 'block';
+    }
+    
+    // 레벨별 챕터 범위 계산
+    const chapterRange = getChaptersForLevel(level, totalChapters);
+    
+    // 챕터 선택 드롭다운 업데이트 (레벨에 맞는 챕터만 표시)
+    if (chapterSelect) {
+        chapterSelect.innerHTML = '';
+        for (let i = chapterRange.start; i <= chapterRange.end; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = `Chapter ${i}`;
+            chapterSelect.appendChild(option);
+        }
+    }
+    
+    // 레벨에 맞는 첫 번째 챕터 로드
+    const firstChapter = chapterRange.start;
+    await loadReferenceChapter(bookTitle, firstChapter, level);
     
     // 레벨 전환 버튼 숨기기 (해당 레벨만 보이므로 전환 불필요)
     if (referenceLevelToggle) {
@@ -1965,43 +2433,477 @@ function loadOriginalTextForRoom(roomId, level) {
         chapterSelect.parentNode.replaceChild(newChapterSelect, chapterSelect);
         
         // 새 리스너 추가
-        newChapterSelect.addEventListener('change', function() {
+        newChapterSelect.addEventListener('change', async function() {
             const selectedChapter = parseInt(this.value);
-            loadChapterContent(selectedChapter, currentReferenceLevel);
+            if (currentReferenceBook) {
+                await loadReferenceChapter(currentReferenceBook, selectedChapter, currentReferenceLevel);
+            }
         });
     }
 }
 
-// 챕터 내용 로드 함수
-function loadChapterContent(chapterNumber, level) {
-    const chapterData = chapterTexts[chapterNumber] || chapterTexts[1];
-    const referenceLevelContents = document.querySelectorAll('.reference-level-content');
-    const referenceViewer = document.getElementById('reference-viewer');
+// 원문 참조 패널에 챕터 로드 함수
+async function loadReferenceChapter(bookTitle, chapterNumber, level) {
     const referencePassage = document.getElementById('reference-passage');
+    const referenceLevelContents = document.querySelectorAll('.reference-level-content');
+    const referenceChapterContent = document.getElementById('reference-chapter-content');
     
-    if (!chapterData) return;
+    if (!referencePassage) return;
     
-    // 현재 레벨의 텍스트 가져오기
-    const texts = chapterData[level] || chapterData.beginner;
+    // 로딩 상태 표시
+    referencePassage.innerHTML = '<p class="reference-text">챕터를 불러오는 중...</p>';
     
-    // 기본 패널 콘텐츠 업데이트 (해당 레벨의 내용만)
-    if (referencePassage) {
-        referencePassage.innerHTML = texts.map(text => `<p class="reference-text">${text}</p>`).join('');
+    try {
+        let textContent = null;
+        let data = null;
+        
+        // The Great Gatsby는 JSON 파일에서 로드
+        if (bookTitle === 'The Great Gatsby' || bookTitle.includes('Gatsby')) {
+            const jsonUrl = window.location.origin + '/data/The_Great_Gatsby_chapters.json';
+            const jsonResponse = await fetch(jsonUrl);
+            
+            if (!jsonResponse.ok) {
+                throw new Error(`JSON 파일을 불러올 수 없습니다. (HTTP ${jsonResponse.status})`);
+            }
+            
+            const jsonData = await jsonResponse.json();
+            const chapter = jsonData.chapters.find(ch => ch.chapter_number === chapterNumber);
+            
+            if (!chapter) {
+                throw new Error(`챕터 ${chapterNumber}를 찾을 수 없습니다.`);
+            }
+            
+            textContent = chapter.content;
+            data = {
+                text_content: chapter.content,
+                chapter_number: chapter.chapter_number,
+                book_title: jsonData.book_title,
+                author: jsonData.author
+            };
+        } else {
+            // 다른 책들은 MongoDB에서 로드
+            const encodedBookTitle = encodeURIComponent(bookTitle);
+            const response = await fetch(`http://localhost:11304/api/book/chapter/${encodedBookTitle}/${chapterNumber}`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP 오류: ${response.status}`);
+            }
+            
+            data = await response.json();
+            
+            if (!data.text_content && !data.textContent) {
+                throw new Error('챕터 내용이 없습니다.');
+            }
+            
+            textContent = data.textContent || data.text_content;
+        }
+        
+        // 단어 단위로 분리하여 표시 (viewer.js와 동일한 방식)
+        const words = textContent.split(/\s+/);
+        const textContentHtml = words.map(word => 
+            `<span class="word">${escapeHtml(word)}</span>`
+        ).join(' ');
+        
+        // 번역 버튼과 토글 영역 HTML 생성
+        const translationButton = `
+            <button 
+                id="reference-translate-btn" 
+                class="reference-translate-btn" 
+                data-book-title="${escapeHtml(bookTitle)}"
+                data-chapter-num="${chapterNumber}"
+                style="padding: 6px 12px; background: #4a90e2; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.3s ease; display: flex; align-items: center; gap: 6px; margin-left: auto;"
+                title="한국어 번역 보기"
+            >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 8l6 6"></path>
+                    <path d="M4 14l6-6 2-3"></path>
+                    <path d="M2 5h12"></path>
+                    <path d="M7 2h1"></path>
+                    <path d="M22 22l-5-10-5 10"></path>
+                    <path d="M14 18h6"></path>
+                </svg>
+                <span>한국어 번역</span>
+            </button>
+        `;
+        
+        const viewToggleSection = `
+            <div id="reference-view-toggle" style="display: none; margin-bottom: 12px; text-align: center;">
+                <button 
+                    id="reference-show-original-btn" 
+                    class="reference-view-toggle-btn active"
+                    style="padding: 6px 16px; background: #4a90e2; color: white; border: none; border-radius: 6px 0 0 6px; cursor: pointer; font-size: 13px;"
+                >
+                    원문
+                </button>
+                <button 
+                    id="reference-show-translation-btn" 
+                    class="reference-view-toggle-btn"
+                    style="padding: 6px 16px; background: #e0e0e0; color: #666; border: none; border-radius: 0 6px 6px 0; cursor: pointer; font-size: 13px; margin-left: -1px;"
+                >
+                    번역
+                </button>
+            </div>
+        `;
+        
+        const translationSection = `
+            <div id="reference-translation-section" style="display: none; margin-top: 12px; padding: 16px; background: #f9f9f9; border-radius: 8px; border: 1px solid #e0e0e0; width: 100%; max-width: 100%; box-sizing: border-box; overflow: visible;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h5 style="margin: 0; color: #333; font-size: 14px;">📖 한국어 번역</h5>
+                    <button 
+                        id="reference-close-translation-btn" 
+                        style="background: transparent; border: none; cursor: pointer; padding: 4px; color: #666; font-size: 16px;"
+                        title="번역 닫기"
+                    >
+                        ×
+                    </button>
+                </div>
+                <div id="reference-translation-content" style="line-height: 1.8; color: #333; font-size: 14px; width: 100%; max-width: 100%; word-wrap: break-word; overflow-wrap: break-word; overflow: visible; box-sizing: border-box;">
+                    <p style="text-align: center; color: #666;">번역 중...</p>
+                </div>
+            </div>
+        `;
+        
+        // 기본 패널 콘텐츠 업데이트
+        referencePassage.innerHTML = `<div class="reference-chapter-text">${textContentHtml}</div>`;
+        
+        // 확장 패널의 해당 레벨 콘텐츠 업데이트
+        referenceLevelContents.forEach(content => {
+            const contentLevel = content.dataset.level;
+            if (contentLevel === level) {
+                content.classList.add('active');
+                content.style.display = 'block';
+                // 번역 버튼, 토글, 번역 영역 포함하여 업데이트
+                content.innerHTML = `
+                    ${viewToggleSection}
+                    <div id="reference-original-text" class="reference-chapter-text" style="width: 100%; max-width: 100%; word-wrap: break-word; overflow-wrap: break-word; overflow: visible; box-sizing: border-box;">${textContentHtml}</div>
+                    ${translationSection}
+                `;
+            } else {
+                content.classList.remove('active');
+                content.style.display = 'none';
+            }
+        });
+        
+        // 원문 참조 패널 헤더에 번역 버튼 추가
+        const referenceChapterHeader = document.querySelector('.reference-chapter-header');
+        if (referenceChapterHeader) {
+            // 기존 번역 버튼이 있으면 제거
+            const existingTranslateBtn = document.getElementById('reference-translate-btn');
+            if (existingTranslateBtn) {
+                existingTranslateBtn.remove();
+            }
+            // 번역 버튼 추가
+            const translateBtnWrapper = document.createElement('div');
+            translateBtnWrapper.innerHTML = translationButton;
+            const newTranslateBtn = translateBtnWrapper.firstElementChild;
+            referenceChapterHeader.appendChild(newTranslateBtn);
+            
+            // 번역 버튼에 직접 이벤트 리스너 연결
+            newTranslateBtn.addEventListener('click', async function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                console.log('번역 버튼 클릭됨:', bookTitle, chapterNumber);
+                
+                // 현재 활성화된 레벨 콘텐츠에서 텍스트 가져오기
+                const activeContent = document.querySelector('.reference-level-content.active');
+                let currentTextContent = textContent;
+                
+                if (activeContent) {
+                    const originalTextDiv = activeContent.querySelector('#reference-original-text');
+                    if (originalTextDiv) {
+                        // 단어 span에서 텍스트 추출
+                        const wordSpans = originalTextDiv.querySelectorAll('.word');
+                        if (wordSpans.length > 0) {
+                            currentTextContent = Array.from(wordSpans).map(span => span.textContent).join(' ');
+                            console.log('텍스트 추출됨 (단어 span):', currentTextContent.substring(0, 100));
+                        } else {
+                            // word span이 없으면 직접 텍스트 가져오기
+                            currentTextContent = originalTextDiv.textContent || originalTextDiv.innerText || textContent;
+                            console.log('텍스트 추출됨 (직접):', currentTextContent.substring(0, 100));
+                        }
+                    } else {
+                        // reference-original-text가 없으면 전체 텍스트 가져오기
+                        currentTextContent = activeContent.textContent || activeContent.innerText || textContent;
+                        console.log('텍스트 추출됨 (전체):', currentTextContent.substring(0, 100));
+                    }
+                }
+                
+                if (!currentTextContent || currentTextContent.trim().length === 0) {
+                    alert('번역할 텍스트를 찾을 수 없습니다.');
+                    console.error('텍스트를 찾을 수 없음');
+                    return;
+                }
+                
+                await translateReferenceChapter(bookTitle, chapterNumber, currentTextContent);
+            });
+        }
+        
+        // 단어 클릭 및 토글 버튼 이벤트 리스너 통합 (이벤트 위임 사용)
+        const referenceViewer = document.getElementById('reference-viewer');
+        if (referenceViewer) {
+            // 기존 리스너 제거를 위해 새로 추가
+            const newReferenceViewer = referenceViewer.cloneNode(true);
+            referenceViewer.parentNode.replaceChild(newReferenceViewer, referenceViewer);
+            
+            newReferenceViewer.addEventListener('click', async function(e) {
+                // 원문/번역 토글 버튼 클릭 처리
+                const showOriginalBtn = e.target.closest('#reference-show-original-btn');
+                const showTranslationBtn = e.target.closest('#reference-show-translation-btn');
+                const closeTranslationBtn = e.target.closest('#reference-close-translation-btn');
+                
+                if (showOriginalBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // 현재 활성화된 레벨 콘텐츠에서 요소 찾기
+                    const activeContent = document.querySelector('.reference-level-content.active');
+                    if (activeContent) {
+                        const originalText = activeContent.querySelector('#reference-original-text');
+                        const translationSection = activeContent.querySelector('#reference-translation-section');
+                        
+                        if (originalText) originalText.style.display = 'block';
+                        if (translationSection) translationSection.style.display = 'none';
+                        
+                        showOriginalBtn.style.background = '#4a90e2';
+                        showOriginalBtn.style.color = 'white';
+                        
+                        const translationBtn = activeContent.querySelector('#reference-show-translation-btn');
+                        if (translationBtn) {
+                            translationBtn.style.background = '#e0e0e0';
+                            translationBtn.style.color = '#666';
+                        }
+                    }
+                    return;
+                }
+                
+                if (showTranslationBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // 현재 활성화된 레벨 콘텐츠에서 요소 찾기
+                    const activeContent = document.querySelector('.reference-level-content.active');
+                    if (activeContent) {
+                        const originalText = activeContent.querySelector('#reference-original-text');
+                        const translationSection = activeContent.querySelector('#reference-translation-section');
+                        
+                        if (originalText) originalText.style.display = 'none';
+                        if (translationSection) translationSection.style.display = 'block';
+                        
+                        showTranslationBtn.style.background = '#4a90e2';
+                        showTranslationBtn.style.color = 'white';
+                        
+                        const originalBtn = activeContent.querySelector('#reference-show-original-btn');
+                        if (originalBtn) {
+                            originalBtn.style.background = '#e0e0e0';
+                            originalBtn.style.color = '#666';
+                        }
+                    }
+                    return;
+                }
+                
+                if (closeTranslationBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // 현재 활성화된 레벨 콘텐츠에서 요소 찾기
+                    const activeContent = document.querySelector('.reference-level-content.active');
+                    if (activeContent) {
+                        const translationSection = activeContent.querySelector('#reference-translation-section');
+                        const viewToggle = activeContent.querySelector('#reference-view-toggle');
+                        const originalText = activeContent.querySelector('#reference-original-text');
+                        
+                        if (translationSection) translationSection.style.display = 'none';
+                        if (viewToggle) viewToggle.style.display = 'none';
+                        if (originalText) originalText.style.display = 'block';
+                        
+                        // 원문 버튼 활성화
+                        const originalBtn = activeContent.querySelector('#reference-show-original-btn');
+                        if (originalBtn) {
+                            originalBtn.style.background = '#4a90e2';
+                            originalBtn.style.color = 'white';
+                        }
+                        
+                        // 번역 버튼 비활성화
+                        const translationBtn = activeContent.querySelector('#reference-show-translation-btn');
+                        if (translationBtn) {
+                            translationBtn.style.background = '#e0e0e0';
+                            translationBtn.style.color = '#666';
+                        }
+                    }
+                    return;
+                }
+                
+                // 단어 클릭 이벤트 처리
+                if (e.target.tagName === 'SPAN' && e.target.classList.contains('word')) {
+                    let clickedWord = e.target.textContent.trim();
+                    if (!clickedWord) return;
+                    
+                    // 구두점 제거 및 소문자 변환
+                    clickedWord = clickedWord.replace(/[.,!?;:"'"]/g, '').toLowerCase();
+                    
+                    try {
+                        // 백엔드 AI API 호출
+                        const response = await fetch('http://127.0.0.1:11304/api/ai/lookup', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                word: clickedWord
+                            })
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error('AI API 요청 실패 또는 서버 오류 발생');
+                        }
+                        
+                        const data = await response.json();
+                        
+                        // 툴팁 표시 (viewer.js의 함수 사용)
+                        if (typeof showWordTooltipWithData === 'function') {
+                            showWordTooltipWithData(e.target, data);
+                        } else {
+                            // viewer.js의 함수가 없으면 직접 표시
+                            alert(`단어: ${data.word} (${data.pronunciation || '발음 정보 없음'})\n뜻: ${data.meaning}\n예문: ${data.example}`);
+                        }
+                    } catch (error) {
+                        console.error("AI 뜻 검색 실패:", error);
+                        if (typeof showErrorTooltip === 'function') {
+                            showErrorTooltip(e.target, error.message);
+                        } else {
+                            alert(`단어 검색 중 오류가 발생했습니다: ${error.message}`);
+                        }
+                    }
+                }
+            });
+        }
+        
+    } catch (error) {
+        console.error('챕터 로드 오류:', error);
+        referencePassage.innerHTML = `
+            <p class="reference-text" style="color: #ff6b6b;">
+                ⚠️ 챕터를 불러올 수 없습니다: ${escapeHtml(error.message)}
+            </p>
+        `;
+    }
+}
+
+// 원문 참조 패널 챕터 번역 함수
+async function translateReferenceChapter(bookTitle, chapterNumber, textContent) {
+    console.log('translateReferenceChapter 호출됨:', { bookTitle, chapterNumber, textLength: textContent?.length });
+    
+    // 현재 활성화된 레벨 콘텐츠에서 번역 영역 찾기
+    const activeContent = document.querySelector('.reference-level-content.active');
+    if (!activeContent) {
+        console.error('❌ 활성화된 레벨 콘텐츠를 찾을 수 없습니다.');
+        alert('번역 영역을 찾을 수 없습니다. 챕터를 다시 로드해주세요.');
+        return;
     }
     
-    // 확장 패널의 해당 레벨 콘텐츠 업데이트
-    referenceLevelContents.forEach(content => {
-        const contentLevel = content.dataset.level;
-        if (contentLevel === level) {
-            const textsForLevel = chapterData[contentLevel] || [];
-            content.innerHTML = textsForLevel.map(text => `<p class="reference-text">${text}</p>`).join('');
-        }
-    });
+    const translationContent = activeContent.querySelector('#reference-translation-content');
+    const translationSection = activeContent.querySelector('#reference-translation-section');
+    const viewToggle = activeContent.querySelector('#reference-view-toggle');
     
-    // 챕터 제목 업데이트 (필요시)
-    const chapterHeader = document.querySelector('.reference-chapter-header h5');
-    if (chapterHeader) {
-        chapterHeader.textContent = chapterData.title;
+    if (!translationContent || !translationSection) {
+        console.error('❌ 번역 영역을 찾을 수 없습니다.', { translationContent, translationSection });
+        alert('번역 영역을 찾을 수 없습니다. 페이지를 새로고침해주세요.');
+        return;
+    }
+    
+    // 번역 영역 표시
+    translationSection.style.display = 'block';
+    if (viewToggle) viewToggle.style.display = 'block';
+    
+    // 로딩 상태 표시
+    translationContent.innerHTML = '<p style="text-align: center; color: #666;">번역 중입니다. 잠시만 기다려주세요...</p>';
+    
+    try {
+        // fetchTranslation 함수 사용 (EN -> KO) - AI 뷰어와 동일한 방식
+        let translatedText;
+        
+        if (typeof window.fetchTranslation === 'function') {
+            console.log('window.fetchTranslation 사용');
+            translatedText = await window.fetchTranslation(textContent, 'ko');
+        } else {
+            console.log('직접 API 호출');
+            // 직접 API 호출 - AI 뷰어와 동일한 형식 사용
+            const response = await fetch('http://127.0.0.1:11304/api/translate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    text: textContent,
+                    source_lang: 'EN',
+                    target_lang: 'KO'
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`서버 오류: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            // AI 뷰어와 동일한 응답 형식 확인
+            if (data.success && data.translatedText) {
+                translatedText = data.translatedText;
+            } else {
+                throw new Error(data.message || '번역 결과를 받을 수 없습니다.');
+            }
+            console.log('번역 결과 받음:', translatedText?.substring(0, 100));
+        }
+        
+        if (!translatedText) {
+            throw new Error('번역 결과를 받을 수 없습니다.');
+        }
+        
+        // 번역 결과를 문단 단위로 분리하여 표시 (AI 뷰어와 동일한 방식)
+        const paragraphs = translatedText.split(/\n\n+/).filter(p => p.trim());
+        const translationHtml = paragraphs.map(para => {
+            const trimmedPara = para.trim();
+            if (!trimmedPara) return '';
+            return `<p style="margin: 0 0 12px 0; line-height: 1.8; width: 100%; max-width: 100%; word-wrap: break-word; overflow-wrap: break-word; box-sizing: border-box;">${escapeHtml(trimmedPara)}</p>`;
+        }).join('');
+        
+        translationContent.innerHTML = translationHtml || `<p style="white-space: pre-wrap; line-height: 1.8; width: 100%; max-width: 100%; word-wrap: break-word; overflow-wrap: break-word; box-sizing: border-box;">${escapeHtml(translatedText)}</p>`;
+        console.log('번역 완료');
+        
+        // 번역 완료 후 자동으로 번역 뷰로 전환
+        const originalText = activeContent.querySelector('#reference-original-text');
+        const showOriginalBtn = activeContent.querySelector('#reference-show-original-btn');
+        const showTranslationBtn = activeContent.querySelector('#reference-show-translation-btn');
+        
+        if (originalText && translationSection) {
+            // 원문 숨기고 번역 표시
+            originalText.style.display = 'none';
+            translationSection.style.display = 'block';
+            
+            // 토글 버튼 상태 업데이트
+            if (showOriginalBtn && showTranslationBtn) {
+                showOriginalBtn.style.background = '#e0e0e0';
+                showOriginalBtn.style.color = '#666';
+                showTranslationBtn.style.background = '#4a90e2';
+                showTranslationBtn.style.color = 'white';
+            }
+        }
+        
+    } catch (error) {
+        console.error('❌ 번역 오류:', error);
+        // AI 뷰어와 동일한 에러 메시지 형식 사용
+        translationContent.innerHTML = `
+            <p style="text-align: center; color: #ff6b6b;">
+                ⚠️ 번역 중 오류가 발생했습니다: ${escapeHtml(error.message)}
+            </p>
+        `;
+    }
+}
+
+// 챕터 내용 로드 함수 (하위 호환성을 위해 유지, 실제로는 loadReferenceChapter 사용)
+async function loadChapterContent(chapterNumber, level) {
+    if (currentReferenceBook) {
+        await loadReferenceChapter(currentReferenceBook, chapterNumber, level);
     }
 }
 
@@ -2237,7 +3139,8 @@ async function requestAiCorrection(text, targetLang = 'EN') {
 }
 
 // 범용 번역 함수 (서버의 /api/translate 엔드포인트 사용)
-async function fetchTranslation(text, targetLang) {
+// 전역 스코프에 노출 (viewer.js에서 사용)
+window.fetchTranslation = async function fetchTranslation(text, targetLang) {
     try {
         // 입력 검증
         if (!text || !text.trim()) {
@@ -2292,14 +3195,42 @@ async function fetchTranslation(text, targetLang) {
 
 // 현재 챕터의 전체 텍스트를 가져오는 함수
 function getCurrentChapterText() {
-    const viewer = document.getElementById('viewer');
-    if (!viewer) return '';
+    const viewer = document.getElementById('original-text-viewer');
+    if (!viewer) {
+        console.warn('⚠️ original-text-viewer 요소를 찾을 수 없습니다.');
+        return '';
+    }
 
-    // 현재 활성화된 레벨 확인
+    // viewer.js의 loadChapter가 생성한 .word 요소들에서 텍스트 수집
+    // .chapter-text div 내부의 .word 요소도 포함하여 검색
+    const wordElements = viewer.querySelectorAll('.word');
+    
+    // .chapter-text div 내부에서도 시도
+    const chapterTextDiv = viewer.querySelector('.chapter-text');
+    if (chapterTextDiv) {
+        const wordsInChapterText = chapterTextDiv.querySelectorAll('.word');
+        
+        if (wordsInChapterText.length > 0) {
+            // .word 요소들의 텍스트를 순서대로 가져와서 공백으로 연결
+            const texts = Array.from(wordsInChapterText).map(el => el.textContent.trim());
+            const result = texts.join(' ');
+            return result;
+        }
+    }
+    
+    if (wordElements.length > 0) {
+        // .word 요소가 있으면 (viewer.js로 로드된 경우)
+        const texts = Array.from(wordElements).map(el => el.textContent.trim());
+        const result = texts.join(' ');
+        return result;
+    }
+
+    // 기존 방식: .viewer-level.active와 .viewer-text 구조 (하위 호환성)
     const activeLevel = document.querySelector('.viewer-level.active');
-    if (!activeLevel) return '';
+    if (!activeLevel) {
+        return '';
+    }
 
-    // 활성 레벨의 모든 텍스트 수집
     const textElements = activeLevel.querySelectorAll('.viewer-text');
     const texts = Array.from(textElements).map(el => el.textContent.trim()).filter(text => text.length > 0);
     
@@ -2320,6 +3251,7 @@ async function fetchSummary() {
     const chapterText = getCurrentChapterText();
     
     if (!chapterText || !chapterText.trim()) {
+        console.error('❌ 챕터 텍스트를 가져올 수 없습니다.');
         summaryResult.innerHTML = '<p style="color: #ff6b6b;">⚠️ 챕터 텍스트를 가져올 수 없습니다. 챕터를 선택했는지 확인해주세요.</p>';
         summaryResult.style.display = 'block';
         if (summaryPlaceholder) summaryPlaceholder.style.display = 'none';
@@ -2382,6 +3314,7 @@ async function handleDiscussionTopics() {
     const chapterText = getCurrentChapterText();
     
     if (!chapterText || !chapterText.trim()) {
+        console.error('❌ 챕터 텍스트를 가져올 수 없습니다.');
         topicsResult.innerHTML = '<p style="color: #ff6b6b;">⚠️ 챕터 텍스트를 가져올 수 없습니다. 챕터를 선택했는지 확인해주세요.</p>';
         topicsResult.style.display = 'block';
         if (topicsPlaceholder) topicsPlaceholder.style.display = 'none';
@@ -2525,9 +3458,6 @@ async function handleTextTranslation(text, clickedElement) {
         translationText.textContent = translatedText;
         translationText.style.color = '#000';
         
-        // 성공 메시지
-        console.log('번역 완료:', translatedText);
-        
         // 3초 후 하이라이트 제거
         setTimeout(() => {
             clickedElement.style.backgroundColor = '';
@@ -2657,9 +3587,7 @@ document.addEventListener('DOMContentLoaded', function() {
         mapSearchBtn.addEventListener('click', function() {
             const searchTerm = mapSearchInput.value.trim();
             if (searchTerm) {
-                console.log('지도 검색:', searchTerm);
                 // TODO: Google Maps API 연동 시 여기에 검색 로직 추가
-                alert(`"${searchTerm}" 검색 기능은 지도 API 연동 후 사용 가능합니다.`);
             }
         });
         
@@ -2673,18 +3601,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // 주변 장소 추천 버튼
     if (nearbyPlacesBtn) {
         nearbyPlacesBtn.addEventListener('click', function() {
-            console.log('주변 장소 추천 클릭');
-            // TODO: Google Maps API 연동 시 여기에 주변 장소 검색 로직 추가
-            alert('주변 장소 추천 기능은 지도 API 연동 후 사용 가능합니다.');
+            searchNearbyReadingPlaces();
         });
     }
     
     // 책 속 장소 찾기 버튼
     if (bookPlacesBtn) {
         bookPlacesBtn.addEventListener('click', function() {
-            console.log('책 속 장소 찾기 클릭');
-            // TODO: Google Maps API 연동 시 여기에 책 속 장소 검색 로직 추가
-            alert('책 속 장소 찾기 기능은 지도 API 연동 후 사용 가능합니다.');
+            showBookPlacesModal();
         });
     }
     
@@ -2822,7 +3746,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const isPublic = visibilityRadio?.value === 'public';
             
             if (!name || !address) {
-                alert('장소 이름과 주소를 입력해주세요.');
                 return;
             }
             
@@ -2841,7 +3764,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             closeSavePlaceModal();
             loadSavedPlaces();
-            alert('장소가 저장되었습니다.');
         });
     }
     
@@ -2949,18 +3871,19 @@ document.addEventListener('DOMContentLoaded', function() {
         loadSavedPlaces();
     }
     
-    // 독서 기록 남기기 버튼
-    const placeRecordButtons = document.querySelectorAll('.place-record-btn');
-    placeRecordButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const placeItem = this.closest('.place-item');
+    // 독서 기록 남기기 버튼 (이벤트 위임 사용)
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.place-record-btn')) {
+            const button = e.target.closest('.place-record-btn');
+            const placeItem = button.closest('.place-item');
             const placeName = placeItem.querySelector('.place-name')?.textContent || '이 장소';
             const placeAddress = placeItem.querySelector('.place-address')?.textContent || '';
             
-            console.log('독서 기록 남기기:', placeName, placeAddress);
-            // TODO: 독서 기록 기능 구현 시 여기에 로직 추가
-            alert(`"${placeName}"에서 독서 기록을 남기시겠습니까?\n\n주소: ${placeAddress}\n\n기능 구현 예정입니다.`);
-        });
+            console.log('📝 독서 기록 남기기:', placeName, placeAddress);
+            
+            // 독서 기록 저장
+            saveReadingRecord(placeName, placeAddress);
+        }
     });
     
     // 도서 검색 기능
@@ -3140,6 +4063,65 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('선택한 책:', bookId, bookTitle);
             // AI 뷰어 페이지로 이동
             showPage('ai-viewer-page');
+        });
+    });
+
+    // view-btn 클릭 이벤트: 책 목록에서 AI 뷰어로 전환하고 1장 로드
+    const viewButtons = document.querySelectorAll('.view-btn');
+    viewButtons.forEach(button => {
+        button.addEventListener('click', async function() {
+            // data-book-title 속성에서 책 제목 가져오기
+            const bookTitle = this.getAttribute('data-book-title');
+            
+            if (!bookTitle) {
+                console.error('❌ data-book-title 속성이 없습니다.');
+                return;
+            }
+            
+            console.log('📖 선택한 책:', bookTitle);
+            
+            // 현재 선택된 책 제목 저장
+            currentBookTitle = bookTitle;
+            currentViewerLevel = 'beginner'; // 초기 레벨은 beginner
+            cachedTotalChapters = null; // 캐시 초기화
+            
+            // AI 뷰어 페이지로 전환
+            showPage('ai-viewer-page');
+            
+            // 목차에 책 이름 업데이트 및 동적 생성 (챕터 수 가져오기, beginner 레벨)
+            await updateTableOfContents(bookTitle, null, 'beginner');
+            
+            // 페이지 전환 후 약간의 지연을 두고 챕터 로드 (DOM 업데이트 대기)
+            setTimeout(async () => {
+                try {
+                    // loadChapter 함수가 전역 스코프에 있는지 확인
+                    if (typeof loadChapter === 'function') {
+                        // 레벨별 첫 번째 챕터 로드
+                        const totalChapters = cachedTotalChapters || (bookTitle === 'The Great Gatsby' ? 10 : 61);
+                        const chapterRange = getChaptersForLevel('beginner', totalChapters);
+                        const firstChapter = chapterRange.start;
+                        
+                        await loadChapter(bookTitle, firstChapter);
+                        currentViewerChapter = firstChapter;
+                        
+                        // 뷰어 섹션으로 스크롤
+                        const viewerElement = document.getElementById('original-text-viewer');
+                        if (viewerElement) {
+                            viewerElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        } else {
+                            // viewer 요소가 없으면 ai-viewer-page로 스크롤
+                            const aiViewerPage = document.getElementById('ai-viewer-page');
+                            if (aiViewerPage) {
+                                aiViewerPage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }
+                        }
+                    } else {
+                        console.error('❌ loadChapter 함수를 찾을 수 없습니다. viewer.js가 로드되었는지 확인하세요.');
+                    }
+                } catch (error) {
+                    console.error('❌ 챕터 로드 오류:', error);
+                }
+            }, 100);
         });
     });
 
@@ -4276,39 +5258,55 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // 좋아요 버튼 이벤트 리스너
+    // 좋아요 버튼 이벤트 리스너 (이벤트 위임 방식으로 변경)
     function attachLikeButtonListeners() {
-        const likeButtons = document.querySelectorAll('.playlist-like-btn');
-        likeButtons.forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const playlistId = this.getAttribute('data-playlist-id');
-                if (!playlistId) return;
-                
-                const currentLike = getPlaylistLikes(playlistId);
-                const newLiked = !currentLike.liked;
-                const updatedLike = setPlaylistLike(playlistId, newLiked);
-                
-                // UI 업데이트
-                updatePlaylistLikeUI(playlistId);
-                
-                // 내 플레이리스트에도 업데이트
-                const myPlaylistLikeBtn = document.querySelector(`#my-playlists .playlist-like-btn[data-playlist-id="${playlistId}"]`);
-                const myPlaylistLikeCount = document.querySelector(`#my-playlists .playlist-like-count[data-playlist-id="${playlistId}"]`);
-                if (myPlaylistLikeBtn) {
-                    if (updatedLike.liked) {
-                        myPlaylistLikeBtn.classList.add('liked');
-                    } else {
-                        myPlaylistLikeBtn.classList.remove('liked');
-                    }
+        // 이벤트 위임을 사용하여 동적으로 생성되는 요소에도 작동하도록 함
+        // 기존 리스너가 있으면 제거
+        const playlistPage = document.getElementById('playlist-page');
+        if (!playlistPage) return;
+        
+        // 기존 리스너 제거를 위해 새 리스너로 교체
+        const existingHandler = playlistPage._likeButtonHandler;
+        if (existingHandler) {
+            playlistPage.removeEventListener('click', existingHandler);
+        }
+        
+        // 새로운 이벤트 핸들러 생성
+        const likeButtonHandler = function(e) {
+            const likeButton = e.target.closest('.playlist-like-btn');
+            if (!likeButton) return;
+            
+            e.stopPropagation();
+            const playlistId = likeButton.getAttribute('data-playlist-id');
+            if (!playlistId) return;
+            
+            const currentLike = getPlaylistLikes(playlistId);
+            const newLiked = !currentLike.liked;
+            const updatedLike = setPlaylistLike(playlistId, newLiked);
+            
+            // UI 업데이트
+            updatePlaylistLikeUI(playlistId);
+            
+            // 내 플레이리스트에도 업데이트
+            const myPlaylistLikeBtn = document.querySelector(`#my-playlists .playlist-like-btn[data-playlist-id="${playlistId}"]`);
+            const myPlaylistLikeCount = document.querySelector(`#my-playlists .playlist-like-count[data-playlist-id="${playlistId}"]`);
+            if (myPlaylistLikeBtn) {
+                if (updatedLike.liked) {
+                    myPlaylistLikeBtn.classList.add('liked');
+                } else {
+                    myPlaylistLikeBtn.classList.remove('liked');
                 }
-                if (myPlaylistLikeCount) {
-                    myPlaylistLikeCount.textContent = updatedLike.count;
-                }
-                
-                console.log('좋아요:', playlistId, newLiked ? '추가' : '제거', '총', updatedLike.count);
-            });
-        });
+            }
+            if (myPlaylistLikeCount) {
+                myPlaylistLikeCount.textContent = updatedLike.count;
+            }
+            
+            console.log('좋아요:', playlistId, newLiked ? '추가' : '제거', '총', updatedLike.count);
+        };
+        
+        // 핸들러를 저장하여 나중에 제거할 수 있도록 함
+        playlistPage._likeButtonHandler = likeButtonHandler;
+        playlistPage.addEventListener('click', likeButtonHandler);
     }
 
     // 모든 플레이리스트 좋아요 UI 초기화
@@ -4475,7 +5473,11 @@ document.addEventListener('DOMContentLoaded', function() {
         // 기존 카드 제거
         myPlaylistsGrid.innerHTML = '';
         
-        if (myPlaylists.length === 0) {
+        // 내가 만든 플레이리스트 모음 확인
+        const myPlaylistCollections = JSON.parse(localStorage.getItem('myPlaylistCollections') || '[]');
+        
+        // myPlaylists와 myPlaylistCollections가 모두 비어있을 때만 빈 메시지 표시
+        if (myPlaylists.length === 0 && myPlaylistCollections.length === 0) {
             if (emptyMessage) {
                 emptyMessage.style.display = 'block';
                 myPlaylistsGrid.appendChild(emptyMessage);
@@ -4491,7 +5493,6 @@ document.addEventListener('DOMContentLoaded', function() {
         myPlaylists.sort((a, b) => b.addedAt - a.addedAt);
         
         // 내가 만든 플레이리스트 모음 표시
-        const myPlaylistCollections = JSON.parse(localStorage.getItem('myPlaylistCollections') || '[]');
         myPlaylistCollections.sort((a, b) => b.createdAt - a.createdAt);
         
         myPlaylistCollections.forEach(collection => {
@@ -4575,6 +5576,15 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // 동적으로 생성된 버튼에 이벤트 리스너 추가
         attachMyPlaylistEventListeners();
+        
+        // 좋아요 버튼 이벤트 리스너 다시 연결 (동적으로 생성된 카드 포함)
+        attachLikeButtonListeners();
+        
+        // 모든 플레이리스트 좋아요 UI 업데이트
+        const allPlaylistIds = ['public-1', 'public-2', 'public-3', 'public-4', 'public-5', 'public-6'];
+        allPlaylistIds.forEach(id => {
+            updatePlaylistLikeUI(id);
+        });
         
         // 내 플레이리스트 카드 클릭 이벤트 (미리보기 팝업 열기)
         const myPlaylistCards = document.querySelectorAll('#my-playlists .my-playlist-card');
@@ -4754,7 +5764,43 @@ document.addEventListener('DOMContentLoaded', function() {
         attachThumbnailEditButtonListener(collectionId);
         
         // 모달 내 좋아요 버튼 이벤트 리스너 추가
-        attachModalLikeButtonListener();
+        attachMyPlaylistModalLikeButtonListener(collectionId);
+    }
+    
+    // 내 플레이리스트 모달 내 좋아요 버튼 이벤트 리스너
+    function attachMyPlaylistModalLikeButtonListener(collectionId) {
+        const detailLikeBtn = document.getElementById('my-playlist-detail-like-btn');
+        if (!detailLikeBtn) return;
+        
+        // 기존 리스너 제거를 위해 새로 추가
+        const newBtn = detailLikeBtn.cloneNode(true);
+        detailLikeBtn.parentNode.replaceChild(newBtn, detailLikeBtn);
+        
+        newBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const playlistId = this.getAttribute('data-playlist-id') || collectionId;
+            if (!playlistId) return;
+            
+            const currentLike = getPlaylistLikes(playlistId);
+            const newLiked = !currentLike.liked;
+            const updatedLike = setPlaylistLike(playlistId, newLiked);
+            
+            // 모달 내 UI 업데이트
+            if (updatedLike.liked) {
+                this.classList.add('liked');
+            } else {
+                this.classList.remove('liked');
+            }
+            const detailLikeCount = document.getElementById('my-playlist-detail-like-count');
+            if (detailLikeCount) {
+                detailLikeCount.textContent = updatedLike.count;
+            }
+            
+            // 공개 플레이리스트와 내 플레이리스트 UI도 업데이트
+            updatePlaylistLikeUI(playlistId);
+            
+            console.log('좋아요:', playlistId, newLiked ? '추가' : '제거', '총', updatedLike.count);
+        });
     }
     
     // 내 플레이리스트 상세 모달 닫기
@@ -5148,8 +6194,8 @@ function loadGoogleMapsAPI() {
 
     console.log('🔄 Google Maps API를 로드하는 중...');
 
-    // Google Maps API 스크립트 동적 로드
-    const mapScriptUrl = `https://maps.googleapis.com/maps/api/js?key=${MAPS_API_KEY}&callback=initMap`;
+    // Google Maps API 스크립트 동적 로드 (Places 라이브러리 포함)
+    const mapScriptUrl = `https://maps.googleapis.com/maps/api/js?key=${MAPS_API_KEY}&libraries=places&callback=initMap`;
     const script = document.createElement('script');
     script.src = mapScriptUrl;
     script.defer = true;
@@ -5194,8 +6240,707 @@ function initMap() {
         console.log('📍 중심 좌표:', centerCoords);
         console.log('🔍 확대 레벨:', 12);
 
-        // 3. 장소 데이터 로드 및 마커 표시
-        loadPlacesAndDisplayMarkers(map);
+        // 3. 지도 클릭 이벤트 추가 - 클릭한 위치 정보만 표시 (마커는 추가하지 않음)
+        const infoWindow = new google.maps.InfoWindow();
+        
+        map.addListener('click', (event) => {
+            const clickedLocation = {
+                lat: event.latLng.lat(),
+                lng: event.latLng.lng()
+            };
+            
+            // 해당 위치에 이미 마커가 있는지 확인
+            const existingMarker = currentMarkers.find(m => {
+                const pos = m.getPosition();
+                return pos && Math.abs(pos.lat() - clickedLocation.lat) < 0.0001 && 
+                       Math.abs(pos.lng() - clickedLocation.lng) < 0.0001;
+            });
+            
+            // 이미 마커가 있으면 해당 마커의 InfoWindow 표시
+            if (existingMarker) {
+                google.maps.event.trigger(existingMarker, 'click');
+                return;
+            }
+            
+            // InfoWindow 내용 생성 (마커 추가 버튼 포함)
+            const locationId = `location-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            const infoContent = `
+                <div id="${locationId}" style="padding: 12px; min-width: 200px; font-family: 'Noto Sans KR', sans-serif;">
+                    <h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: bold; color: #333;">
+                        📍 장소 정보
+                    </h3>
+                    <p style="margin: 0 0 6px 0; font-size: 13px; color: #666;">
+                        <strong>위도:</strong> ${clickedLocation.lat.toFixed(6)}
+                    </p>
+                    <p style="margin: 0 0 12px 0; font-size: 13px; color: #666;">
+                        <strong>경도:</strong> ${clickedLocation.lng.toFixed(6)}
+                    </p>
+                    <button 
+                        id="add-marker-btn-${locationId}" 
+                        class="info-window-add-marker-btn" 
+                        style="width: 100%; padding: 8px 12px; background: rgba(78, 205, 196, 0.2); border: 1px solid rgba(78, 205, 196, 0.5); border-radius: 6px; cursor: pointer; transition: all 0.3s ease; color: #2d7d7a; font-size: 13px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 6px;"
+                        title="이 위치에 마커 추가"
+                    >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        <span>마커 추가</span>
+                    </button>
+                </div>
+            `;
+            
+            // InfoWindow 표시 (마커 없이)
+            infoWindow.close();
+            infoWindow.setContent(infoContent);
+            infoWindow.setPosition(clickedLocation);
+            infoWindow.open(map);
+            
+            // InfoWindow가 DOM에 추가된 후 마커 추가 버튼 이벤트 리스너 추가
+            google.maps.event.addListenerOnce(infoWindow, 'domready', () => {
+                const addMarkerBtn = document.getElementById(`add-marker-btn-${locationId}`);
+                if (addMarkerBtn) {
+                    addMarkerBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        
+                        // 마커 생성
+                        const marker = new google.maps.Marker({
+                            position: clickedLocation,
+                            map: map,
+                            title: '선택한 장소',
+                            icon: {
+                                path: google.maps.SymbolPath.CIRCLE,
+                                scale: 10,
+                                fillColor: '#4ECDC4',
+                                fillOpacity: 0.9,
+                                strokeColor: '#FFFFFF',
+                                strokeWeight: 2
+                            },
+                            animation: google.maps.Animation.DROP
+                        });
+                        
+                        // 마커를 currentMarkers 배열에 추가
+                        const markerId = `user-marker-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+                        marker.markerId = markerId;
+                        
+                        // 마커에 장소 정보 저장
+                        marker.placeName = '선택한 장소';
+                        marker.placeLocation = clickedLocation;
+                        
+                        currentMarkers.push(marker);
+                        
+                        // 삭제 버튼 이벤트 리스너 추가 함수
+                        const attachDeleteButtonListener = () => {
+                            const deleteBtn = document.getElementById(`delete-marker-btn-${markerId}`);
+                            if (deleteBtn) {
+                                deleteBtn.addEventListener('click', (e) => {
+                                    e.stopPropagation();
+                                    // 마커 삭제
+                                    marker.setMap(null);
+                                    // currentMarkers 배열에서 제거
+                                    const index = currentMarkers.indexOf(marker);
+                                    if (index > -1) {
+                                        currentMarkers.splice(index, 1);
+                                    }
+                                    // InfoWindow 닫기
+                                    infoWindow.close();
+                                    console.log('✅ 마커가 삭제되었습니다.');
+                                });
+                                
+                                // 호버 효과
+                                deleteBtn.addEventListener('mouseenter', () => {
+                                    deleteBtn.style.background = '#f5f5f5';
+                                    deleteBtn.style.transform = 'scale(1.1)';
+                                });
+                                
+                                deleteBtn.addEventListener('mouseleave', () => {
+                                    deleteBtn.style.background = '#ffffff';
+                                    deleteBtn.style.transform = 'scale(1)';
+                                });
+                            }
+                        };
+                        
+                        // 마커가 추가된 후 InfoWindow 내용 업데이트 (삭제 버튼 포함)
+                        const updatedInfoContent = `
+                            <div id="${markerId}" style="padding: 12px; min-width: 200px; font-family: 'Noto Sans KR', sans-serif; position: relative;">
+                                <button 
+                                    id="delete-marker-btn-${markerId}" 
+                                    class="info-window-delete-btn" 
+                                    style="position: absolute; top: 8px; right: 8px; background: #ffffff; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; color: #000000; padding: 0;"
+                                    title="마커 삭제"
+                                >
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                    </svg>
+                                </button>
+                                <h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: bold; color: #333; padding-right: 40px;">
+                                    📍 선택한 장소
+                                </h3>
+                                <p style="margin: 0 0 6px 0; font-size: 13px; color: #666;">
+                                    <strong>위도:</strong> ${clickedLocation.lat.toFixed(6)}
+                                </p>
+                                <p style="margin: 0; font-size: 13px; color: #666;">
+                                    <strong>경도:</strong> ${clickedLocation.lng.toFixed(6)}
+                                </p>
+                            </div>
+                        `;
+                        
+                        // InfoWindow 내용 업데이트
+                        infoWindow.setContent(updatedInfoContent);
+                        infoWindow.open(map, marker);
+                        
+                        // 삭제 버튼 이벤트 리스너 추가
+                        google.maps.event.addListenerOnce(infoWindow, 'domready', attachDeleteButtonListener);
+                        
+                        // 마커 클릭 시 InfoWindow 표시
+                        marker.addListener('click', () => {
+                            infoWindow.close();
+                            infoWindow.setContent(updatedInfoContent);
+                            infoWindow.open(map, marker);
+                            
+                            // InfoWindow가 DOM에 추가된 후 삭제 버튼 이벤트 리스너 추가
+                            google.maps.event.addListenerOnce(infoWindow, 'domready', attachDeleteButtonListener);
+                        });
+                        
+                        console.log('📍 마커가 추가되었습니다:', clickedLocation);
+                    });
+                    
+                    // 호버 효과
+                    addMarkerBtn.addEventListener('mouseenter', () => {
+                        addMarkerBtn.style.background = 'rgba(78, 205, 196, 0.3)';
+                        addMarkerBtn.style.borderColor = 'rgba(78, 205, 196, 0.7)';
+                    });
+                    
+                    addMarkerBtn.addEventListener('mouseleave', () => {
+                        addMarkerBtn.style.background = 'rgba(78, 205, 196, 0.2)';
+                        addMarkerBtn.style.borderColor = 'rgba(78, 205, 196, 0.5)';
+                    });
+                }
+            });
+            
+            console.log('📍 장소 정보 표시:', clickedLocation);
+        });
+        
+        // Google Maps 기본 InfoWindow에 마커 추가/삭제 버튼 주입
+        // 주기적으로 체크하는 함수
+        const checkAndInjectButtons = () => {
+            // Google Maps InfoWindow 컨테이너 찾기
+            const infoWindowContainers = document.querySelectorAll('.gm-style-iw-d, .gm-style-iw-t');
+            
+            infoWindowContainers.forEach((infoWindowContainer) => {
+                // 이미 버튼이 추가되었는지 확인
+                if (infoWindowContainer.querySelector('.custom-marker-controls')) {
+                    return;
+                }
+                
+                // 우리가 만든 InfoWindow(지도 클릭 시 생성, 마커 클릭 시 생성)는 제외
+                // 우리가 만든 InfoWindow는 특정 ID 패턴을 가짐
+                if (infoWindowContainer.querySelector('[id^="location-"]') || 
+                    infoWindowContainer.querySelector('[id^="place-info-"]') ||
+                    infoWindowContainer.querySelector('[id^="marker-info-"]') ||
+                    infoWindowContainer.querySelector('.info-window-add-marker-btn') ||
+                    infoWindowContainer.querySelector('.info-window-delete-btn')) {
+                    return;
+                }
+                
+                // InfoWindow 내용에서 장소 정보 추출 시도
+                const titleElement = infoWindowContainer.querySelector('h1, h2, h3, h4, h5, h6, [role="heading"], .gm-style-iw-d > div:first-child');
+                let placeName = '';
+                
+                if (titleElement) {
+                    placeName = titleElement.textContent.trim();
+                } else {
+                    // 제목이 없는 경우 첫 번째 텍스트 노드 사용
+                    const firstText = Array.from(infoWindowContainer.childNodes).find(node => 
+                        node.nodeType === 3 && node.textContent.trim()
+                    );
+                    if (firstText) {
+                        placeName = firstText.textContent.trim().split('\n')[0];
+                    }
+                }
+                
+                if (!placeName) {
+                    return; // 장소 이름을 찾을 수 없으면 스킵
+                }
+                
+                // InfoWindow의 위치 가져오기
+                // Google Maps InfoWindow는 보통 .gm-style-iw-c 클래스를 가진 부모 요소에 위치 정보가 있음
+                const infoWindowWrapper = infoWindowContainer.closest('.gm-style-iw-c');
+                let placeLocation = null;
+                
+                // 1. 주소 링크에서 좌표 추출 시도 (가장 정확)
+                const mapLink = infoWindowContainer.querySelector('a[href*="maps.google.com"], a[href*="google.com/maps"]');
+                if (mapLink && mapLink.href) {
+                    try {
+                        const url = new URL(mapLink.href);
+                        
+                        // URL 경로에서 좌표 추출 (예: /@37.5665,126.9780,17z) - 가장 정확
+                        const pathMatch = url.pathname.match(/@(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+                        if (pathMatch) {
+                            placeLocation = { lat: parseFloat(pathMatch[1]), lng: parseFloat(pathMatch[2]) };
+                            console.log('📍 URL 경로에서 좌표 추출:', placeLocation);
+                        }
+                        
+                        // URL 쿼리 파라미터에서 좌표 추출
+                        if (!placeLocation) {
+                            const query = url.searchParams.get('q') || url.searchParams.get('ll') || url.searchParams.get('center');
+                            if (query) {
+                                // 좌표 형식: "37.5665,126.9780" 또는 "37.5665, 126.9780"
+                                const coords = query.split(/[,\s]+/).map(Number).filter(n => !isNaN(n));
+                                if (coords.length >= 2) {
+                                    placeLocation = { lat: coords[0], lng: coords[1] };
+                                    console.log('📍 URL 쿼리에서 좌표 추출:', placeLocation);
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('좌표 추출 실패:', e);
+                    }
+                }
+                
+                // 2. Places API를 사용하여 장소 이름으로 검색 (정확도 높음)
+                if (!placeLocation && placeName && window.google && window.google.maps && window.google.maps.places) {
+                    try {
+                        const placesService = new google.maps.places.PlacesService(map);
+                        const request = {
+                            query: placeName,
+                            fields: ['geometry', 'name']
+                        };
+                        
+                        placesService.textSearch(request, (results, status) => {
+                            if (status === google.maps.places.PlacesServiceStatus.OK && results && results.length > 0) {
+                                const firstResult = results[0];
+                                if (firstResult.geometry && firstResult.geometry.location) {
+                                    const location = {
+                                        lat: firstResult.geometry.location.lat(),
+                                        lng: firstResult.geometry.location.lng()
+                                    };
+                                    console.log('📍 Places API에서 좌표 추출:', location);
+                                    
+                                    // 버튼에 저장된 placeLocation 업데이트
+                                    const addBtn = infoWindowContainer.querySelector('.custom-add-marker-btn');
+                                    if (addBtn && addBtn.dataset) {
+                                        addBtn.dataset.placeLat = location.lat;
+                                        addBtn.dataset.placeLng = location.lng;
+                                    }
+                                    
+                                    // 동적으로 마커 추가 버튼의 이벤트 리스너 업데이트
+                                    if (addBtn) {
+                                        const newAddBtn = addBtn.cloneNode(true);
+                                        addBtn.parentNode.replaceChild(newAddBtn, addBtn);
+                                        
+                                        newAddBtn.addEventListener('click', (e) => {
+                                            e.stopPropagation();
+                                            const marker = new google.maps.Marker({
+                                                position: location,
+                                                map: map,
+                                                title: placeName,
+                                                icon: {
+                                                    path: google.maps.SymbolPath.CIRCLE,
+                                                    scale: 12,
+                                                    fillColor: '#4ECDC4',
+                                                    fillOpacity: 0.9,
+                                                    strokeColor: '#FFFFFF',
+                                                    strokeWeight: 2
+                                                },
+                                                animation: google.maps.Animation.DROP,
+                                                markerId: `user-marker-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+                                            });
+                                            currentMarkers.push(marker);
+                                            console.log('✅ 마커가 추가되었습니다 (Places API 좌표):', location);
+                                        });
+                                    }
+                                }
+                            }
+                        });
+                    } catch (e) {
+                        console.warn('Places API 검색 실패:', e);
+                    }
+                }
+                
+                // InfoWindow가 표시되는 위치에서 좌표 추출 (마지막 수단)
+                if (!placeLocation && infoWindowWrapper) {
+                    // InfoWindow의 화면 위치를 지도 좌표로 변환
+                    const rect = infoWindowWrapper.getBoundingClientRect();
+                    const mapRect = mapElement.getBoundingClientRect();
+                    // InfoWindow의 화살표가 가리키는 위치 (InfoWindow의 하단 중앙)
+                    const x = rect.left + rect.width / 2 - mapRect.left;
+                    const y = rect.bottom - mapRect.top; // InfoWindow의 하단 위치 사용 (화살표 위치)
+                    
+                    // 화면 좌표를 지도 좌표로 변환
+                    try {
+                        // Google Maps projection 사용 (가장 정확)
+                        const projection = map.getProjection();
+                        if (projection) {
+                            const scale = Math.pow(2, map.getZoom());
+                            const center = map.getCenter();
+                            const centerPoint = projection.fromLatLngToPoint(center);
+                            
+                            // 픽셀 좌표를 지도 좌표로 변환
+                            // Google Maps는 타일 크기가 256픽셀
+                            const pixelX = (x - mapRect.width / 2) / (256 * scale);
+                            const pixelY = (y - mapRect.height / 2) / (256 * scale);
+                            
+                            const point = new google.maps.Point(
+                                centerPoint.x + pixelX,
+                                centerPoint.y + pixelY
+                            );
+                            
+                            const latLng = projection.fromPointToLatLng(point);
+                            placeLocation = { lat: latLng.lat(), lng: latLng.lng() };
+                            
+                            console.log('📍 InfoWindow 위치에서 좌표 추출 (projection):', placeLocation);
+                        } else {
+                            // projection을 사용할 수 없는 경우 bounds 사용
+                            const center = map.getCenter();
+                            const bounds = map.getBounds();
+                            if (bounds && center) {
+                                const ne = bounds.getNorthEast();
+                                const sw = bounds.getSouthWest();
+                                const latRange = ne.lat() - sw.lat();
+                                const lngRange = ne.lng() - sw.lng();
+                                
+                                const mapWidth = mapRect.width;
+                                const mapHeight = mapRect.height;
+                                
+                                // 화면 좌표를 지도 좌표로 변환
+                                const latOffset = (y / mapHeight) * latRange;
+                                const lngOffset = ((x - mapWidth / 2) / mapWidth) * lngRange;
+                                
+                                placeLocation = {
+                                    lat: center.lat() - latOffset,
+                                    lng: center.lng() + lngOffset
+                                };
+                                
+                                console.log('📍 InfoWindow 위치에서 좌표 추출 (bounds):', placeLocation);
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('좌표 변환 실패:', e);
+                    }
+                }
+                
+                if (placeLocation) {
+                    // 해당 위치에 이미 사용자 마커가 있는지 확인
+                    const existingUserMarker = currentMarkers.find(m => {
+                        if (!m.markerId || !m.markerId.startsWith('user-marker-')) return false;
+                        const pos = m.getPosition();
+                        return pos && Math.abs(pos.lat() - placeLocation.lat) < 0.0001 && 
+                               Math.abs(pos.lng() - placeLocation.lng) < 0.0001;
+                    });
+                    
+                    const hasUserMarker = !!existingUserMarker;
+                    
+                    // 버튼 컨테이너 생성
+                    const controlsContainer = document.createElement('div');
+                    controlsContainer.className = 'custom-marker-controls';
+                    controlsContainer.style.cssText = 'margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(0,0,0,0.1); display: flex; gap: 8px; justify-content: center;';
+                    
+                    // 마커 추가/삭제 버튼 생성
+                    if (hasUserMarker) {
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.className = 'custom-delete-marker-btn';
+                        deleteBtn.innerHTML = `
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                            <span>삭제</span>
+                        `;
+                        deleteBtn.style.cssText = 'display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: #ffffff; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 6px; cursor: pointer; transition: all 0.3s ease; color: #000000; font-size: 13px; font-weight: 500;';
+                        deleteBtn.title = '마커 삭제';
+                        
+                        deleteBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            if (existingUserMarker) {
+                                existingUserMarker.setMap(null);
+                                const index = currentMarkers.indexOf(existingUserMarker);
+                                if (index > -1) {
+                                    currentMarkers.splice(index, 1);
+                                }
+                                // 버튼을 추가 버튼으로 변경
+                                controlsContainer.innerHTML = '';
+                                const addBtn = createAddMarkerButton(placeName, placeLocation, controlsContainer, map);
+                                controlsContainer.appendChild(addBtn);
+                                console.log('✅ 마커가 삭제되었습니다.');
+                            }
+                        });
+                        
+                        deleteBtn.addEventListener('mouseenter', () => {
+                            deleteBtn.style.background = '#f5f5f5';
+                            deleteBtn.style.transform = 'scale(1.05)';
+                        });
+                        
+                        deleteBtn.addEventListener('mouseleave', () => {
+                            deleteBtn.style.background = '#ffffff';
+                            deleteBtn.style.transform = 'scale(1)';
+                        });
+                        
+                        controlsContainer.appendChild(deleteBtn);
+                    } else {
+                        const addBtn = createAddMarkerButton(placeName, placeLocation, controlsContainer, map);
+                        controlsContainer.appendChild(addBtn);
+                    }
+                    
+                    // InfoWindow 내용에 버튼 추가
+                    infoWindowContainer.appendChild(controlsContainer);
+                    console.log('✅ Google Maps InfoWindow에 버튼 추가:', placeName);
+                }
+            });
+        };
+        
+        // 마커 추가 버튼 생성 함수
+        const createAddMarkerButton = (placeName, placeLocation, container, map) => {
+            const addBtn = document.createElement('button');
+            addBtn.className = 'custom-add-marker-btn';
+            
+            // 좌표를 데이터 속성에 저장 (나중에 Places API로 업데이트 가능)
+            if (placeLocation) {
+                addBtn.dataset.placeLat = placeLocation.lat;
+                addBtn.dataset.placeLng = placeLocation.lng;
+            }
+            addBtn.dataset.placeName = placeName;
+            
+            addBtn.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span>마커 추가</span>
+            `;
+            addBtn.style.cssText = 'display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: rgba(78, 205, 196, 0.2); border: 1px solid rgba(78, 205, 196, 0.5); border-radius: 6px; cursor: pointer; transition: all 0.3s ease; color: #2d7d7a; font-size: 13px; font-weight: 500;';
+            addBtn.title = '마커 추가';
+            
+            addBtn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                
+                // 좌표 가져오기 (데이터 속성에서 우선, 없으면 placeLocation 사용)
+                let markerLocation = placeLocation;
+                if (addBtn.dataset.placeLat && addBtn.dataset.placeLng) {
+                    markerLocation = {
+                        lat: parseFloat(addBtn.dataset.placeLat),
+                        lng: parseFloat(addBtn.dataset.placeLng)
+                    };
+                }
+                
+                // 좌표가 없으면 Places API로 검색
+                if (!markerLocation && placeName && window.google && window.google.maps && window.google.maps.places) {
+                    try {
+                        const placesService = new google.maps.places.PlacesService(map);
+                        const request = {
+                            query: placeName,
+                            fields: ['geometry', 'name']
+                        };
+                        
+                        const result = await new Promise((resolve, reject) => {
+                            placesService.textSearch(request, (results, status) => {
+                                if (status === google.maps.places.PlacesServiceStatus.OK && results && results.length > 0) {
+                                    const firstResult = results[0];
+                                    if (firstResult.geometry && firstResult.geometry.location) {
+                                        resolve({
+                                            lat: firstResult.geometry.location.lat(),
+                                            lng: firstResult.geometry.location.lng()
+                                        });
+                                    } else {
+                                        reject(new Error('좌표를 찾을 수 없습니다'));
+                                    }
+                                } else {
+                                    reject(new Error('장소를 찾을 수 없습니다'));
+                                }
+                            });
+                        });
+                        
+                        markerLocation = result;
+                        console.log('📍 Places API로 좌표 검색 완료:', markerLocation);
+                    } catch (error) {
+                        console.warn('Places API 검색 실패:', error);
+                        alert('장소 위치를 찾을 수 없습니다. 다른 방법으로 시도해주세요.');
+                        return;
+                    }
+                }
+                
+                if (!markerLocation) {
+                    console.error('❌ 마커 위치를 찾을 수 없습니다.');
+                    alert('장소 위치를 찾을 수 없습니다.');
+                    return;
+                }
+                
+                // 사용자 마커 생성
+                const userMarker = new google.maps.Marker({
+                    position: markerLocation,
+                    map: map,
+                    title: placeName,
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: 12,
+                        fillColor: '#4ECDC4',
+                        fillOpacity: 0.9,
+                        strokeColor: '#FFFFFF',
+                        strokeWeight: 2
+                    },
+                    animation: google.maps.Animation.DROP,
+                    markerId: `user-marker-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+                });
+                
+                // 마커에 장소 정보 저장 (나중에 클릭 시 사용)
+                userMarker.placeName = placeName;
+                userMarker.placeLocation = markerLocation;
+                
+                currentMarkers.push(userMarker);
+                
+                // 마커 클릭 시 InfoWindow 표시 (삭제 버튼만)
+                const markerInfoWindow = new google.maps.InfoWindow();
+                userMarker.addListener('click', () => {
+                    const markerInfoContent = `
+                        <div id="marker-info-${userMarker.markerId}" style="padding: 12px; min-width: 200px; font-family: 'Noto Sans KR', sans-serif; position: relative;">
+                            <button 
+                                id="delete-marker-btn-${userMarker.markerId}" 
+                                class="info-window-delete-btn" 
+                                style="position: absolute; top: 8px; right: 8px; background: #ffffff; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; color: #000000; padding: 0;"
+                                title="마커 삭제"
+                            >
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                            </button>
+                            <h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: bold; color: #333; padding-right: 50px;">
+                                📍 ${placeName}
+                            </h3>
+                            <p style="margin: 0 0 6px 0; font-size: 13px; color: #666;">
+                                <strong>위도:</strong> ${markerLocation.lat.toFixed(6)}
+                            </p>
+                            <p style="margin: 0 0 6px 0; font-size: 13px; color: #666;">
+                                <strong>경도:</strong> ${markerLocation.lng.toFixed(6)}
+                            </p>
+                        </div>
+                    `;
+                    
+                    markerInfoWindow.close();
+                    markerInfoWindow.setContent(markerInfoContent);
+                    markerInfoWindow.open(map, userMarker);
+                    
+                    // InfoWindow가 DOM에 추가된 후 삭제 버튼 이벤트 리스너 추가
+                    google.maps.event.addListenerOnce(markerInfoWindow, 'domready', () => {
+                        const deleteBtn = document.getElementById(`delete-marker-btn-${userMarker.markerId}`);
+                        if (deleteBtn) {
+                            deleteBtn.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                
+                                // 마커 삭제
+                                userMarker.setMap(null);
+                                const index = currentMarkers.indexOf(userMarker);
+                                if (index > -1) {
+                                    currentMarkers.splice(index, 1);
+                                }
+                                
+                                // InfoWindow 닫기
+                                markerInfoWindow.close();
+                                
+                                // Google Maps 기본 InfoWindow가 열려있으면 버튼을 추가 버튼으로 변경
+                                setTimeout(() => {
+                                    checkAndInjectButtons();
+                                }, 300);
+                                
+                                console.log('✅ 마커가 삭제되었습니다.');
+                            });
+                            
+                            deleteBtn.addEventListener('mouseenter', () => {
+                                deleteBtn.style.background = '#f5f5f5';
+                                deleteBtn.style.transform = 'scale(1.1)';
+                            });
+                            
+                            deleteBtn.addEventListener('mouseleave', () => {
+                                deleteBtn.style.background = '#ffffff';
+                                deleteBtn.style.transform = 'scale(1)';
+                            });
+                        }
+                    });
+                });
+                
+                // 버튼을 삭제 버튼으로 변경
+                container.innerHTML = '';
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'custom-delete-marker-btn';
+                deleteBtn.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    <span>삭제</span>
+                `;
+                deleteBtn.style.cssText = 'display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: #ffffff; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 6px; cursor: pointer; transition: all 0.3s ease; color: #000000; font-size: 13px; font-weight: 500;';
+                deleteBtn.title = '마커 삭제';
+                
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    userMarker.setMap(null);
+                    const index = currentMarkers.indexOf(userMarker);
+                    if (index > -1) {
+                        currentMarkers.splice(index, 1);
+                    }
+                    // 버튼을 추가 버튼으로 변경
+                    container.innerHTML = '';
+                    const newAddBtn = createAddMarkerButton(placeName, placeLocation, container, map);
+                    container.appendChild(newAddBtn);
+                    console.log('✅ 마커가 삭제되었습니다.');
+                });
+                
+                deleteBtn.addEventListener('mouseenter', () => {
+                    deleteBtn.style.background = '#f5f5f5';
+                    deleteBtn.style.transform = 'scale(1.05)';
+                });
+                
+                deleteBtn.addEventListener('mouseleave', () => {
+                    deleteBtn.style.background = '#ffffff';
+                    deleteBtn.style.transform = 'scale(1)';
+                });
+                
+                container.appendChild(deleteBtn);
+                console.log('✅ 마커가 추가되었습니다.');
+            });
+            
+            addBtn.addEventListener('mouseenter', () => {
+                addBtn.style.background = 'rgba(78, 205, 196, 0.3)';
+                addBtn.style.transform = 'scale(1.05)';
+            });
+            
+            addBtn.addEventListener('mouseleave', () => {
+                addBtn.style.background = 'rgba(78, 205, 196, 0.2)';
+                addBtn.style.transform = 'scale(1)';
+            });
+            
+            return addBtn;
+        };
+        
+        // MutationObserver로 InfoWindow 추가 감지
+        const observer = new MutationObserver(() => {
+            checkAndInjectButtons();
+        });
+        
+        // 주기적으로 체크 (InfoWindow가 늦게 로드될 수 있음)
+        const checkInterval = setInterval(() => {
+            checkAndInjectButtons();
+        }, 500);
+        
+        // 지도 컨테이너와 body를 관찰
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+        
+        // 지도 클릭 시에도 체크
+        map.addListener('click', () => {
+            setTimeout(() => {
+                checkAndInjectButtons();
+            }, 300);
+        });
+        
+        // 지도 이동 시에도 체크 (InfoWindow가 열려있을 수 있음)
+        map.addListener('idle', () => {
+            checkAndInjectButtons();
+        });
         
     } catch (error) {
         console.error('❌ 지도 초기화 중 오류 발생:', error);
@@ -5270,6 +7015,1122 @@ async function loadPlacesAndDisplayMarkers(map) {
         console.error('❌ 장소 데이터 로드 중 오류 발생:', error);
         console.error('장소 데이터를 로드할 수 없습니다. places-data.json 파일을 확인하세요.');
     }
+}
+
+// 전역 변수: 마커 배열 (기존 마커 제거용)
+let currentMarkers = [];
+
+/**
+ * 현재 위치를 가져와서 주변 독서 장소를 검색하고 마커로 표시하는 함수
+ */
+async function searchNearbyReadingPlaces() {
+    const map = window.mapInstance;
+    if (!map) {
+        console.error('❌ 지도가 초기화되지 않았습니다.');
+        alert('지도가 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.');
+        return;
+    }
+
+    // 기존 마커 제거
+    clearMarkers();
+
+    // 로딩 메시지 표시
+    const nearbyPlacesBtn = document.getElementById('nearby-places-btn');
+    if (nearbyPlacesBtn) {
+        const originalText = nearbyPlacesBtn.querySelector('span')?.textContent || '주변 장소 추천';
+        nearbyPlacesBtn.disabled = true;
+        nearbyPlacesBtn.querySelector('span').textContent = '검색 중...';
+    }
+
+    try {
+        // 1. 현재 위치 가져오기
+        const position = await getCurrentPosition();
+        const userLocation = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+        };
+
+        console.log('📍 현재 위치:', userLocation);
+
+        // 지도 중심을 현재 위치로 이동 (panTo를 사용하여 부드럽게 이동)
+        map.panTo(userLocation);
+        map.setZoom(15);
+        
+        // 지도 중심 이동이 완료될 때까지 약간의 지연 후 마커 추가
+        // 이렇게 하면 지도가 현재 위치로 이동한 후 마커가 표시됩니다
+        await new Promise(resolve => setTimeout(resolve, 300));
+
+        // 현재 위치 마커 추가
+        const userMarker = new google.maps.Marker({
+            position: userLocation,
+            map: map,
+            title: '내 위치',
+            icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                scale: 8,
+                fillColor: '#4285F4',
+                fillOpacity: 1,
+                strokeColor: '#FFFFFF',
+                strokeWeight: 2
+            }
+        });
+        currentMarkers.push(userMarker);
+
+        // 2. Places API로 주변 장소 검색
+        const places = await searchPlacesNearby(map, userLocation);
+
+        // 3. 검색된 장소를 마커로 표시
+        displayPlaceMarkers(map, places);
+
+        console.log(`✅ ${places.length}개의 주변 독서 장소를 찾았습니다.`);
+
+        if (nearbyPlacesBtn) {
+            nearbyPlacesBtn.disabled = false;
+            nearbyPlacesBtn.querySelector('span').textContent = '주변 장소 추천';
+        }
+
+    } catch (error) {
+        console.error('❌ 주변 장소 검색 오류:', error);
+        alert('주변 장소를 검색하는 중 오류가 발생했습니다: ' + error.message);
+        
+        if (nearbyPlacesBtn) {
+            nearbyPlacesBtn.disabled = false;
+            nearbyPlacesBtn.querySelector('span').textContent = '주변 장소 추천';
+        }
+    }
+}
+
+/**
+ * 책 속 장소 찾기 모달을 표시하는 함수
+ * 읽은 책 목록을 기반으로 각 책과 관련된 장소 정보를 안내합니다.
+ */
+function showBookPlacesModal() {
+    try {
+        // 읽은 책 목록 가져오기
+        const readBooks = getReadBooks();
+        
+        // 독서 기록에서도 책 정보 가져오기
+        const readingRecords = JSON.parse(localStorage.getItem('readingRecords') || '[]');
+        const booksFromRecords = readingRecords
+            .map(record => record.bookTitle)
+            .filter(title => title && title !== '책 정보 없음')
+            .filter((title, index, self) => self.indexOf(title) === index); // 중복 제거
+        
+        // 모든 책 목록 합치기
+        const allBooks = [...readBooks.map(book => book.title), ...booksFromRecords]
+            .filter((title, index, self) => self.indexOf(title) === index); // 중복 제거
+        
+        if (allBooks.length === 0) {
+            alert('읽은 책이 없습니다. 먼저 책을 읽어보세요!');
+            return;
+        }
+        
+        // 책별 관련 장소 정보 (데이터베이스)
+        const bookPlacesData = {
+            '1984': {
+                title: '1984',
+                author: 'George Orwell',
+                places: [
+                    {
+                        name: '런던 (London)',
+                        description: '소설의 배경이 되는 도시. 빅 브라더가 지배하는 전체주의 사회의 무대입니다.',
+                        location: { lat: 51.5074, lng: -0.1278 },
+                        type: '도시'
+                    },
+                    {
+                        name: '빅토리아 역 (Victoria Station)',
+                        description: '소설에서 언급되는 주요 장소 중 하나입니다.',
+                        location: { lat: 51.4952, lng: -0.1441 },
+                        type: '역사적 장소'
+                    }
+                ]
+            },
+            'Pride and Prejudice': {
+                title: 'Pride and Prejudice',
+                author: 'Jane Austen',
+                places: [
+                    {
+                        name: '햄프셔 (Hampshire)',
+                        description: '제인 오스틴이 태어나고 살았던 지역. 소설의 배경인 허트퍼드셔의 모델이 되었습니다.',
+                        location: { lat: 51.0577, lng: -1.3080 },
+                        type: '지역'
+                    },
+                    {
+                        name: '롱본 (Longbourn)',
+                        description: '소설에서 베넷 가족이 살던 집의 이름입니다.',
+                        location: { lat: 51.0577, lng: -1.3080 },
+                        type: '문학적 장소'
+                    },
+                    {
+                        name: '펨벌리 (Pemberley)',
+                        description: '다아시의 저택으로, 소설의 중요한 배경입니다.',
+                        location: { lat: 53.2274, lng: -1.4200 },
+                        type: '문학적 장소'
+                    }
+                ]
+            },
+            'The Great Gatsby': {
+                title: 'The Great Gatsby',
+                author: 'F. Scott Fitzgerald',
+                places: [
+                    {
+                        name: '롱아일랜드 (Long Island)',
+                        description: '소설의 주요 배경. 웨스트 에그와 이스트 에그가 있는 지역입니다.',
+                        location: { lat: 40.7891, lng: -73.1350 },
+                        type: '지역'
+                    },
+                    {
+                        name: '뉴욕 (New York)',
+                        description: '소설에서 중요한 장면들이 벌어지는 도시입니다.',
+                        location: { lat: 40.7128, lng: -74.0060 },
+                        type: '도시'
+                    }
+                ]
+            },
+            'To Kill a Mockingbird': {
+                title: 'To Kill a Mockingbird',
+                author: 'Harper Lee',
+                places: [
+                    {
+                        name: '몽고메리 (Montgomery, Alabama)',
+                        description: '하퍼 리가 태어나고 자란 도시. 소설의 배경인 메이콤의 모델입니다.',
+                        location: { lat: 32.3668, lng: -86.3000 },
+                        type: '도시'
+                    },
+                    {
+                        name: '앨라배마 (Alabama)',
+                        description: '소설의 배경이 되는 주입니다.',
+                        location: { lat: 32.8067, lng: -86.7911 },
+                        type: '주'
+                    }
+                ]
+            }
+        };
+        
+        // 모달 HTML 생성
+        let modalContent = '';
+        
+        allBooks.forEach(bookTitle => {
+            const bookData = bookPlacesData[bookTitle] || null;
+            
+            if (bookData && bookData.places && bookData.places.length > 0) {
+                modalContent += `
+                    <div class="book-places-section">
+                        <div class="book-places-header">
+                            <h4>${escapeHtml(bookData.title)}</h4>
+                            <p class="book-author">${escapeHtml(bookData.author)}</p>
+                        </div>
+                        <div class="book-places-list">
+                            ${bookData.places.map(place => `
+                                <div class="book-place-item">
+                                    <div class="place-info">
+                                        <h5 class="place-name">${escapeHtml(place.name)}</h5>
+                                        <span class="place-type">${escapeHtml(place.type)}</span>
+                                        <p class="place-description">${escapeHtml(place.description)}</p>
+                                    </div>
+                                    ${place.location ? `
+                                        <button type="button" class="place-map-btn" 
+                                                data-lat="${place.location.lat}" 
+                                                data-lng="${place.location.lng}"
+                                                data-place-name="${escapeHtml(place.name)}">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                                <circle cx="12" cy="10" r="3"></circle>
+                                            </svg>
+                                            지도에서 보기
+                                        </button>
+                                    ` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } else {
+                // 관련 장소 정보가 없는 경우
+                modalContent += `
+                    <div class="book-places-section">
+                        <div class="book-places-header">
+                            <h4>${escapeHtml(bookTitle)}</h4>
+                        </div>
+                        <div class="book-places-list">
+                            <p class="no-places-info">이 책과 관련된 장소 정보가 아직 등록되지 않았습니다.</p>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+        
+        if (!modalContent) {
+            alert('읽은 책과 관련된 장소 정보를 찾을 수 없습니다.');
+            return;
+        }
+        
+        // 모달 HTML 생성
+        const modalHTML = `
+            <div id="book-places-modal" class="book-places-modal" style="display: flex;">
+                <div class="modal-overlay"></div>
+                <div class="modal-content book-places-modal-content">
+                    <div class="modal-header">
+                        <h3>📚 책 속 장소 찾기</h3>
+                        <button type="button" class="modal-close-btn" id="book-places-modal-close" aria-label="닫기">×</button>
+                    </div>
+                    <div class="modal-body book-places-modal-body">
+                        <p class="modal-intro">읽은 책과 관련된 실제 장소들을 확인해보세요.</p>
+                        ${modalContent}
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // 기존 모달이 있으면 제거
+        const existingModal = document.getElementById('book-places-modal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+        
+        // 모달 추가
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        
+        // 모달 닫기 버튼 이벤트
+        const closeBtn = document.getElementById('book-places-modal-close');
+        const modal = document.getElementById('book-places-modal');
+        const overlay = modal?.querySelector('.modal-overlay');
+        
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                if (modal) modal.remove();
+            });
+        }
+        
+        if (overlay) {
+            overlay.addEventListener('click', () => {
+                if (modal) modal.remove();
+            });
+        }
+        
+        // 지도에서 보기 버튼 이벤트
+        const mapButtons = modal?.querySelectorAll('.place-map-btn');
+        if (mapButtons) {
+            mapButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const lat = parseFloat(this.getAttribute('data-lat'));
+                    const lng = parseFloat(this.getAttribute('data-lng'));
+                    const placeName = this.getAttribute('data-place-name');
+                    
+                    if (lat && lng && window.mapInstance) {
+                        // 모달 닫기
+                        if (modal) modal.remove();
+                        
+                        // 지도 페이지로 이동
+                        showPage('map-page');
+                        
+                        // 지도 중심 이동 및 마커 표시
+                        setTimeout(() => {
+                            const location = new google.maps.LatLng(lat, lng);
+                            window.mapInstance.setCenter(location);
+                            window.mapInstance.setZoom(12);
+                            
+                            // 마커 추가
+                            const marker = new google.maps.Marker({
+                                position: location,
+                                map: window.mapInstance,
+                                title: placeName,
+                                animation: google.maps.Animation.DROP
+                            });
+                            
+                            // InfoWindow 추가
+                            const infoWindow = new google.maps.InfoWindow({
+                                content: `
+                                    <div style="padding: 10px;">
+                                        <h4 style="margin: 0 0 8px 0; font-size: 16px;">${escapeHtml(placeName)}</h4>
+                                        <p style="margin: 0; color: #666; font-size: 14px;">책과 관련된 장소</p>
+                                    </div>
+                                `
+                            });
+                            
+                            marker.addListener('click', () => {
+                                infoWindow.open(window.mapInstance, marker);
+                            });
+                            
+                            // 기존 마커 목록에 추가
+                            if (window.currentMarkers) {
+                                window.currentMarkers.push(marker);
+                            }
+                        }, 300);
+                    }
+                });
+            });
+        }
+        
+    } catch (error) {
+        console.error('❌ 책 속 장소 찾기 오류:', error);
+        alert('책 속 장소 정보를 불러오는 중 오류가 발생했습니다: ' + error.message);
+    }
+}
+
+/**
+ * 현재 위치를 가져오는 함수
+ */
+function getCurrentPosition() {
+    return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+            reject(new Error('이 브라우저는 위치 정보를 지원하지 않습니다.'));
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            resolve,
+            (error) => {
+                let errorMessage = '위치 정보를 가져올 수 없습니다.';
+                switch (error.code) {
+                    case error.PERMISSION_DENIED:
+                        errorMessage = '위치 정보 접근이 거부되었습니다. 브라우저 설정에서 위치 정보 접근을 허용해주세요.';
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        errorMessage = '위치 정보를 사용할 수 없습니다.';
+                        break;
+                    case error.TIMEOUT:
+                        errorMessage = '위치 정보 요청 시간이 초과되었습니다.';
+                        break;
+                }
+                reject(new Error(errorMessage));
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            }
+        );
+    });
+}
+
+/**
+ * Places API를 사용하여 주변 독서 장소를 검색하는 함수
+ */
+async function searchPlacesNearby(map, location) {
+    return new Promise((resolve, reject) => {
+        if (!window.google || !window.google.maps || !window.google.maps.places) {
+            reject(new Error('Google Places API가 로드되지 않았습니다.'));
+            return;
+        }
+
+        const service = new google.maps.places.PlacesService(map);
+        const allPlaces = [];
+        const searchTypes = [
+            'book_store',      // 서점
+            'library',         // 도서관
+            'cafe'             // 카페 (북카페 포함)
+        ];
+
+        let completedSearches = 0;
+        const totalSearches = searchTypes.length;
+
+        searchTypes.forEach((type) => {
+            const request = {
+                location: location,
+                radius: 2000, // 2km 반경
+                type: type,
+                keyword: type === 'cafe' ? '북카페 책' : undefined // 카페는 북카페 키워드 추가
+            };
+
+            service.nearbySearch(request, (results, status) => {
+                if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+                    // 결과 필터링 (북카페인 경우)
+                    const filteredResults = type === 'cafe' 
+                        ? results.filter(place => 
+                            place.name.toLowerCase().includes('북') || 
+                            place.name.toLowerCase().includes('책') ||
+                            place.name.toLowerCase().includes('book') ||
+                            place.types.includes('book_store')
+                          )
+                        : results;
+
+                    allPlaces.push(...filteredResults);
+                    console.log(`✅ ${type} 검색 완료: ${filteredResults.length}개 장소 발견`);
+                } else if (status === google.maps.places.PlacesServiceStatus.ZERO_RESULTS) {
+                    console.log(`ℹ️ ${type} 검색 결과 없음`);
+                } else {
+                    console.warn(`⚠️ ${type} 검색 오류:`, status);
+                }
+
+                completedSearches++;
+                if (completedSearches === totalSearches) {
+                    // 중복 제거 (같은 place_id를 가진 장소)
+                    const uniquePlaces = [];
+                    const seenPlaceIds = new Set();
+                    
+                    allPlaces.forEach(place => {
+                        if (!seenPlaceIds.has(place.place_id)) {
+                            seenPlaceIds.add(place.place_id);
+                            uniquePlaces.push(place);
+                        }
+                    });
+
+                    resolve(uniquePlaces);
+                }
+            });
+        });
+    });
+}
+
+/**
+ * 검색된 장소를 지도에 마커로 표시하는 함수
+ */
+function displayPlaceMarkers(map, places) {
+    const infoWindow = new google.maps.InfoWindow();
+
+    places.forEach((place) => {
+        // 장소 타입에 따라 다른 아이콘 사용
+        let iconColor = '#FF6B6B'; // 기본 색상
+        let iconType = '📚';
+
+        if (place.types.includes('book_store')) {
+            iconColor = '#4ECDC4';
+            iconType = '📖';
+        } else if (place.types.includes('library')) {
+            iconColor = '#95E1D3';
+            iconType = '📚';
+        } else if (place.types.includes('cafe')) {
+            iconColor = '#F38181';
+            iconType = '☕';
+        }
+
+        // 마커 생성
+        const marker = new google.maps.Marker({
+            position: place.geometry.location,
+            map: map,
+            title: place.name,
+            icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                scale: 10,
+                fillColor: iconColor,
+                fillOpacity: 0.9,
+                strokeColor: '#FFFFFF',
+                strokeWeight: 2
+            },
+            animation: google.maps.Animation.DROP
+        });
+
+        currentMarkers.push(marker);
+
+        // InfoWindow 내용 생성 (고유 ID 추가)
+        const placeInfoId = `place-info-${place.place_id || Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        const placeLocation = {
+            lat: place.geometry.location.lat(),
+            lng: place.geometry.location.lng()
+        };
+        
+        // 해당 위치에 이미 사용자 추가 마커가 있는지 확인
+        const existingUserMarker = currentMarkers.find(m => {
+            if (!m.markerId || !m.markerId.startsWith('user-marker-')) return false;
+            const pos = m.getPosition();
+            return pos && Math.abs(pos.lat() - placeLocation.lat) < 0.0001 && 
+                   Math.abs(pos.lng() - placeLocation.lng) < 0.0001;
+        });
+        
+        const hasUserMarker = !!existingUserMarker;
+        
+        const infoContent = `
+            <div id="${placeInfoId}" style="padding: 12px; min-width: 200px; font-family: 'Noto Sans KR', sans-serif; position: relative;">
+                ${hasUserMarker ? `
+                    <button 
+                        id="delete-user-marker-btn-${placeInfoId}" 
+                        class="info-window-delete-btn" 
+                        style="position: absolute; top: 8px; right: 8px; background: #ffffff; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; color: #000000; padding: 0;"
+                        title="마커 삭제"
+                    >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                    </button>
+                ` : `
+                    <button 
+                        id="add-marker-btn-${placeInfoId}" 
+                        class="info-window-add-marker-btn" 
+                        style="position: absolute; top: 8px; right: 8px; background: rgba(78, 205, 196, 0.2); border: 1px solid rgba(78, 205, 196, 0.5); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; color: #2d7d7a; padding: 0;"
+                        title="마커 추가"
+                    >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </button>
+                `}
+                <h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: bold; color: #333; padding-right: 80px;">
+                    ${iconType} ${place.name}
+                </h3>
+                <p style="margin: 0 0 6px 0; font-size: 13px; color: #666;">
+                    <strong>주소:</strong> ${place.vicinity || '주소 정보 없음'}
+                </p>
+                ${place.rating ? `
+                    <p style="margin: 0 0 6px 0; font-size: 13px; color: #666;">
+                        <strong>평점:</strong> ⭐ ${place.rating} (${place.user_ratings_total || 0}개 리뷰)
+                    </p>
+                ` : ''}
+                ${place.types ? `
+                    <p style="margin: 0 0 8px 0; font-size: 12px; color: #888;">
+                        ${place.types.filter(t => !t.includes('point_of_interest') && !t.includes('establishment')).slice(0, 2).join(', ')}
+                    </p>
+                ` : ''}
+            </div>
+        `;
+
+        // 마커 클릭 이벤트
+        marker.addListener('click', () => {
+            infoWindow.close();
+            
+            // 현재 상태에 맞는 InfoWindow 내용 생성
+            const currentPlaceLocation = {
+                lat: place.geometry.location.lat(),
+                lng: place.geometry.location.lng()
+            };
+            const currentExistingUserMarker = currentMarkers.find(m => {
+                if (!m.markerId || !m.markerId.startsWith('user-marker-')) return false;
+                const pos = m.getPosition();
+                return pos && Math.abs(pos.lat() - currentPlaceLocation.lat) < 0.0001 && 
+                       Math.abs(pos.lng() - currentPlaceLocation.lng) < 0.0001;
+            });
+            const currentHasUserMarker = !!currentExistingUserMarker;
+            
+            // 동적으로 InfoWindow 내용 업데이트
+            // 마커 클릭 시에는 마커가 있으면 삭제 버튼만, 없으면 버튼 없음 (마커 추가는 장소 클릭 시에만)
+            const updatedInfoContent = `
+                <div id="${placeInfoId}" style="padding: 12px; min-width: 200px; font-family: 'Noto Sans KR', sans-serif; position: relative;">
+                    ${currentHasUserMarker ? `
+                        <button 
+                            id="delete-user-marker-btn-${placeInfoId}" 
+                            class="info-window-delete-btn" 
+                            style="position: absolute; top: 8px; right: 8px; background: #ffffff; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; color: #000000; padding: 0;"
+                            title="마커 삭제"
+                        >
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                        </button>
+                    ` : ''}
+                    <h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: bold; color: #333; padding-right: ${currentHasUserMarker ? '50px' : '0'};">
+                        ${iconType} ${place.name}
+                    </h3>
+                    <p style="margin: 0 0 6px 0; font-size: 13px; color: #666;">
+                        <strong>주소:</strong> ${place.vicinity || '주소 정보 없음'}
+                    </p>
+                    ${place.rating ? `
+                        <p style="margin: 0 0 6px 0; font-size: 13px; color: #666;">
+                            <strong>평점:</strong> ⭐ ${place.rating} (${place.user_ratings_total || 0}개 리뷰)
+                        </p>
+                    ` : ''}
+                    ${place.types ? `
+                        <p style="margin: 0 0 8px 0; font-size: 12px; color: #888;">
+                            ${place.types.filter(t => !t.includes('point_of_interest') && !t.includes('establishment')).slice(0, 2).join(', ')}
+                        </p>
+                    ` : ''}
+                </div>
+            `;
+            
+            infoWindow.setContent(updatedInfoContent);
+            infoWindow.open(map, marker);
+            
+            // 사이드바에 장소 정보 추가
+            addPlaceToSidebar(place);
+            
+            // InfoWindow가 DOM에 추가된 후 버튼 이벤트 리스너 추가
+            google.maps.event.addListenerOnce(infoWindow, 'domready', () => {
+                // 마커 추가/삭제 버튼 이벤트 리스너 설정 함수
+                const setupMarkerButtons = () => {
+                    // 마커 추가 버튼
+                    const addMarkerBtn = document.getElementById(`add-marker-btn-${placeInfoId}`);
+                    if (addMarkerBtn) {
+                        // 기존 이벤트 리스너 제거 (중복 방지)
+                        const newAddBtn = addMarkerBtn.cloneNode(true);
+                        addMarkerBtn.parentNode.replaceChild(newAddBtn, addMarkerBtn);
+                        
+                        newAddBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            
+                            // 사용자 마커 생성
+                            const userMarker = new google.maps.Marker({
+                                position: place.geometry.location,
+                                map: map,
+                                title: place.name,
+                                icon: {
+                                    path: google.maps.SymbolPath.CIRCLE,
+                                    scale: 12,
+                                    fillColor: '#4ECDC4',
+                                    fillOpacity: 0.9,
+                                    strokeColor: '#FFFFFF',
+                                    strokeWeight: 2
+                                },
+                                animation: google.maps.Animation.DROP,
+                                markerId: `user-marker-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+                            });
+                            
+                            // 마커에 장소 정보 저장
+                            userMarker.placeName = place.name;
+                            userMarker.placeLocation = {
+                                lat: place.geometry.location.lat(),
+                                lng: place.geometry.location.lng()
+                            };
+                            userMarker.placeData = place;
+                            
+                            currentMarkers.push(userMarker);
+                            
+                            // 마커 클릭 시 InfoWindow 표시 (삭제 버튼만)
+                            const markerInfoWindow = new google.maps.InfoWindow();
+                            userMarker.addListener('click', () => {
+                                const markerInfoContent = `
+                                    <div id="marker-info-${userMarker.markerId}" style="padding: 12px; min-width: 200px; font-family: 'Noto Sans KR', sans-serif; position: relative;">
+                                        <button 
+                                            id="delete-marker-btn-${userMarker.markerId}" 
+                                            class="info-window-delete-btn" 
+                                            style="position: absolute; top: 8px; right: 8px; background: #ffffff; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; color: #000000; padding: 0;"
+                                            title="마커 삭제"
+                                        >
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <polyline points="3 6 5 6 21 6"></polyline>
+                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                            </svg>
+                                        </button>
+                                        <h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: bold; color: #333; padding-right: 50px;">
+                                            ${iconType} ${place.name}
+                                        </h3>
+                                        <p style="margin: 0 0 6px 0; font-size: 13px; color: #666;">
+                                            <strong>주소:</strong> ${place.vicinity || '주소 정보 없음'}
+                                        </p>
+                                        ${place.rating ? `
+                                            <p style="margin: 0 0 6px 0; font-size: 13px; color: #666;">
+                                                <strong>평점:</strong> ⭐ ${place.rating} (${place.user_ratings_total || 0}개 리뷰)
+                                            </p>
+                                        ` : ''}
+                                    </div>
+                                `;
+                                
+                                markerInfoWindow.close();
+                                markerInfoWindow.setContent(markerInfoContent);
+                                markerInfoWindow.open(map, userMarker);
+                                
+                                // InfoWindow가 DOM에 추가된 후 삭제 버튼 이벤트 리스너 추가
+                                google.maps.event.addListenerOnce(markerInfoWindow, 'domready', () => {
+                                    const deleteBtn = document.getElementById(`delete-marker-btn-${userMarker.markerId}`);
+                                    if (deleteBtn) {
+                                        deleteBtn.addEventListener('click', (e) => {
+                                            e.stopPropagation();
+                                            
+                                            // 마커 삭제
+                                            userMarker.setMap(null);
+                                            const index = currentMarkers.indexOf(userMarker);
+                                            if (index > -1) {
+                                                currentMarkers.splice(index, 1);
+                                            }
+                                            
+                                            // InfoWindow 닫기
+                                            markerInfoWindow.close();
+                                            
+                                            // Places API 마커의 InfoWindow 업데이트 (추가 버튼으로 변경)
+                                            updatePlaceInfoWindow(marker, place, placeInfoId, false, null);
+                                            
+                                            console.log('✅ 마커가 삭제되었습니다.');
+                                        });
+                                        
+                                        deleteBtn.addEventListener('mouseenter', () => {
+                                            deleteBtn.style.background = '#f5f5f5';
+                                            deleteBtn.style.transform = 'scale(1.1)';
+                                        });
+                                        
+                                        deleteBtn.addEventListener('mouseleave', () => {
+                                            deleteBtn.style.background = '#ffffff';
+                                            deleteBtn.style.transform = 'scale(1)';
+                                        });
+                                    }
+                                });
+                            });
+                            
+                            // InfoWindow 업데이트 (삭제 버튼으로 변경)
+                            updatePlaceInfoWindow(marker, place, placeInfoId, true, userMarker);
+                            
+                            console.log('✅ 마커가 추가되었습니다.');
+                        });
+                        
+                        // 호버 효과
+                        newAddBtn.addEventListener('mouseenter', () => {
+                            newAddBtn.style.background = 'rgba(78, 205, 196, 0.3)';
+                            newAddBtn.style.transform = 'scale(1.1)';
+                        });
+                        
+                        newAddBtn.addEventListener('mouseleave', () => {
+                            newAddBtn.style.background = 'rgba(78, 205, 196, 0.2)';
+                            newAddBtn.style.transform = 'scale(1)';
+                        });
+                    }
+                    
+                    // 마커 삭제 버튼
+                    const deleteMarkerBtn = document.getElementById(`delete-user-marker-btn-${placeInfoId}`);
+                    if (deleteMarkerBtn) {
+                        // 기존 이벤트 리스너 제거 (중복 방지)
+                        const newDeleteBtn = deleteMarkerBtn.cloneNode(true);
+                        deleteMarkerBtn.parentNode.replaceChild(newDeleteBtn, deleteMarkerBtn);
+                        
+                        // 현재 위치의 사용자 마커 찾기
+                        const placeLocation = {
+                            lat: place.geometry.location.lat(),
+                            lng: place.geometry.location.lng()
+                        };
+                        const existingUserMarker = currentMarkers.find(m => {
+                            if (!m.markerId || !m.markerId.startsWith('user-marker-')) return false;
+                            const pos = m.getPosition();
+                            return pos && Math.abs(pos.lat() - placeLocation.lat) < 0.0001 && 
+                                   Math.abs(pos.lng() - placeLocation.lng) < 0.0001;
+                        });
+                        
+                        if (existingUserMarker) {
+                            newDeleteBtn.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                
+                                // 마커 제거
+                                existingUserMarker.setMap(null);
+                                const index = currentMarkers.indexOf(existingUserMarker);
+                                if (index > -1) {
+                                    currentMarkers.splice(index, 1);
+                                }
+                                
+                                // InfoWindow 업데이트 (추가 버튼으로 변경)
+                                updatePlaceInfoWindow(marker, place, placeInfoId, false, null);
+                                
+                                console.log('✅ 마커가 삭제되었습니다.');
+                            });
+                            
+                            // 호버 효과
+                            newDeleteBtn.addEventListener('mouseenter', () => {
+                                newDeleteBtn.style.background = '#f5f5f5';
+                                newDeleteBtn.style.transform = 'scale(1.1)';
+                            });
+                            
+                            newDeleteBtn.addEventListener('mouseleave', () => {
+                                newDeleteBtn.style.background = '#ffffff';
+                                newDeleteBtn.style.transform = 'scale(1)';
+                            });
+                        }
+                    }
+                };
+                
+                // InfoWindow 업데이트 함수 (먼저 정의)
+                const updatePlaceInfoWindow = (targetMarker, placeData, infoId, hasUserMarker, userMarkerRef) => {
+                    const savedPlaces = JSON.parse(localStorage.getItem('savedPlaces') || '[]');
+                    const isSaved = savedPlaces.some(p => p.placeId === placeData.place_id);
+                    
+                    const updatedContent = `
+                        <div id="${infoId}" style="padding: 12px; min-width: 200px; font-family: 'Noto Sans KR', sans-serif; position: relative;">
+                            ${hasUserMarker ? `
+                                <button 
+                                    id="delete-user-marker-btn-${infoId}" 
+                                    class="info-window-delete-btn" 
+                                    style="position: absolute; top: 8px; right: 8px; background: #ffffff; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; color: #000000; padding: 0;"
+                                    title="마커 삭제"
+                                >
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                    </svg>
+                                </button>
+                            ` : `
+                                <button 
+                                    id="add-marker-btn-${infoId}" 
+                                    class="info-window-add-marker-btn" 
+                                    style="position: absolute; top: 8px; right: 8px; background: rgba(78, 205, 196, 0.2); border: 1px solid rgba(78, 205, 196, 0.5); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; color: #2d7d7a; padding: 0;"
+                                    title="마커 추가"
+                                >
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    </svg>
+                                </button>
+                            `}
+                            <h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: bold; color: #333; padding-right: 80px;">
+                                ${iconType} ${placeData.name}
+                            </h3>
+                            <p style="margin: 0 0 6px 0; font-size: 13px; color: #666;">
+                                <strong>주소:</strong> ${placeData.vicinity || '주소 정보 없음'}
+                            </p>
+                            ${placeData.rating ? `
+                                <p style="margin: 0 0 6px 0; font-size: 13px; color: #666;">
+                                    <strong>평점:</strong> ⭐ ${placeData.rating} (${placeData.user_ratings_total || 0}개 리뷰)
+                                </p>
+                            ` : ''}
+                            ${placeData.types ? `
+                                <p style="margin: 0 0 8px 0; font-size: 12px; color: #888;">
+                                    ${placeData.types.filter(t => !t.includes('point_of_interest') && !t.includes('establishment')).slice(0, 2).join(', ')}
+                                </p>
+                            ` : ''}
+                        </div>
+                    `;
+                    
+                    infoWindow.setContent(updatedContent);
+                    infoWindow.open(map, targetMarker);
+                    
+                    // 버튼 이벤트 리스너 추가
+                    google.maps.event.addListenerOnce(infoWindow, 'domready', () => {
+                        // 마커 추가/삭제 버튼 이벤트
+                        setupMarkerButtons();
+                    });
+                };
+                
+                // 초기 버튼 설정
+                setupMarkerButtons();
+                
+                // 삭제 버튼 이벤트 리스너 (이미 마커가 있는 경우)
+                const deleteUserMarkerBtn = document.getElementById(`delete-user-marker-btn-${placeInfoId}`);
+                if (deleteUserMarkerBtn && currentExistingUserMarker) {
+                    deleteUserMarkerBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        currentExistingUserMarker.setMap(null);
+                        const index = currentMarkers.indexOf(currentExistingUserMarker);
+                        if (index > -1) {
+                            currentMarkers.splice(index, 1);
+                        }
+                        
+                        // InfoWindow 내용을 마커 추가 버튼으로 변경
+                        const restoredContent = `
+                            <div id="${placeInfoId}" style="padding: 12px; min-width: 200px; font-family: 'Noto Sans KR', sans-serif; position: relative;">
+                                <button 
+                                    id="add-marker-btn-${placeInfoId}" 
+                                    class="info-window-add-marker-btn" 
+                                    style="position: absolute; top: 8px; right: 8px; background: rgba(78, 205, 196, 0.2); border: 1px solid rgba(78, 205, 196, 0.5); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; color: #2d7d7a; padding: 0;"
+                                    title="마커 추가"
+                                >
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                                    </svg>
+                                </button>
+                                <h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: bold; color: #333; padding-right: 80px;">
+                                    ${iconType} ${place.name}
+                                </h3>
+                                <p style="margin: 0 0 6px 0; font-size: 13px; color: #666;">
+                                    <strong>주소:</strong> ${place.vicinity || '주소 정보 없음'}
+                                </p>
+                                ${place.rating ? `
+                                    <p style="margin: 0 0 6px 0; font-size: 13px; color: #666;">
+                                        <strong>평점:</strong> ⭐ ${place.rating} (${place.user_ratings_total || 0}개 리뷰)
+                                    </p>
+                                ` : ''}
+                                ${place.types ? `
+                                    <p style="margin: 0 0 8px 0; font-size: 12px; color: #888;">
+                                        ${place.types.filter(t => !t.includes('point_of_interest') && !t.includes('establishment')).slice(0, 2).join(', ')}
+                                    </p>
+                                ` : ''}
+                            </div>
+                        `;
+                        
+                        infoWindow.setContent(restoredContent);
+                        infoWindow.open(map, marker);
+                        
+                        // 마커 추가 버튼 이벤트 리스너 다시 추가
+                        google.maps.event.addListenerOnce(infoWindow, 'domready', () => {
+                            const newAddMarkerBtn = document.getElementById(`add-marker-btn-${placeInfoId}`);
+                            if (newAddMarkerBtn) {
+                                // 마커 추가 로직은 위의 addMarkerBtn 이벤트 리스너와 동일
+                                newAddMarkerBtn.addEventListener('click', (e) => {
+                                    e.stopPropagation();
+                                    // 위의 마커 추가 로직과 동일한 코드를 여기에 추가해야 하지만,
+                                    // 중복을 피하기 위해 함수로 추출하는 것이 좋습니다.
+                                    // 일단 간단하게 처리
+                                });
+                            }
+                        });
+                        
+                        console.log('✅ 마커가 삭제되었습니다.');
+                    });
+                    
+                    deleteUserMarkerBtn.addEventListener('mouseenter', () => {
+                        deleteUserMarkerBtn.style.background = '#f5f5f5';
+                        deleteUserMarkerBtn.style.transform = 'scale(1.1)';
+                    });
+                    
+                    deleteUserMarkerBtn.addEventListener('mouseleave', () => {
+                        deleteUserMarkerBtn.style.background = '#ffffff';
+                        deleteUserMarkerBtn.style.transform = 'scale(1)';
+                    });
+                }
+            });
+        });
+    });
+}
+
+/**
+ * InfoWindow에서 장소를 저장하는 함수
+ */
+function savePlaceFromInfoWindow(place, saveBtn) {
+    try {
+        const savedPlaces = JSON.parse(localStorage.getItem('savedPlaces') || '[]');
+        
+        // 이미 저장된 장소인지 확인
+        const existingIndex = savedPlaces.findIndex(p => p.placeId === place.place_id);
+        
+        if (existingIndex !== -1) {
+            // 이미 저장된 경우 제거
+            savedPlaces.splice(existingIndex, 1);
+            localStorage.setItem('savedPlaces', JSON.stringify(savedPlaces));
+            
+            // 버튼 상태 변경
+            saveBtn.style.background = 'rgba(196, 201, 168, 0.3)';
+            saveBtn.innerHTML = `
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+            `;
+            saveBtn.title = '내 장소에 저장';
+            
+            console.log('✅ 장소가 저장 목록에서 제거되었습니다:', place.name);
+            
+            // 저장된 장소 목록이 표시 중이면 업데이트
+            if (typeof loadSavedPlaces === 'function') {
+                loadSavedPlaces();
+            }
+        } else {
+            // 새로 저장
+            const newPlace = {
+                id: Date.now().toString(),
+                placeId: place.place_id,
+                name: place.name,
+                address: place.vicinity || place.formatted_address || '주소 정보 없음',
+                description: '',
+                latitude: place.geometry.location.lat(),
+                longitude: place.geometry.location.lng(),
+                rating: place.rating || null,
+                user_ratings_total: place.user_ratings_total || 0,
+                types: place.types || [],
+                visibility: 'private',
+                savedAt: new Date().toISOString()
+            };
+            
+            savedPlaces.unshift(newPlace);
+            localStorage.setItem('savedPlaces', JSON.stringify(savedPlaces));
+            
+            // 버튼 상태 변경
+            saveBtn.style.background = 'rgba(196, 201, 168, 0.6)';
+            saveBtn.innerHTML = `
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            `;
+            saveBtn.title = '저장됨';
+            
+            console.log('✅ 장소가 저장되었습니다:', place.name);
+            
+            // 저장된 장소 목록이 표시 중이면 업데이트
+            if (typeof loadSavedPlaces === 'function') {
+                loadSavedPlaces();
+            }
+        }
+    } catch (error) {
+        console.error('❌ 장소 저장 오류:', error);
+        alert('장소를 저장하는 중 오류가 발생했습니다.');
+    }
+}
+
+/**
+ * 사이드바에 장소 정보를 추가하는 함수
+ * @param {Object} place - Google Places API 장소 객체
+ */
+function addPlaceToSidebar(place) {
+    try {
+        const placesList = document.getElementById('places-list');
+        if (!placesList) {
+            console.warn('⚠️ 사이드바 places-list를 찾을 수 없습니다.');
+            return;
+        }
+
+        // 중복 체크: 같은 place_id가 이미 있는지 확인
+        const existingPlace = placesList.querySelector(`[data-place-id="${place.place_id}"]`);
+        if (existingPlace) {
+            console.log('ℹ️ 이미 사이드바에 추가된 장소입니다:', place.name);
+            // 이미 있는 장소로 스크롤
+            existingPlace.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            // 하이라이트 효과
+            existingPlace.style.background = 'rgba(196, 201, 168, 0.3)';
+            setTimeout(() => {
+                existingPlace.style.background = '';
+            }, 2000);
+            return;
+        }
+
+        // 장소 주소 가져오기
+        const address = place.vicinity || place.formatted_address || '주소 정보 없음';
+
+        // 장소 아이템 HTML 생성
+        const placeItem = document.createElement('article');
+        placeItem.className = 'place-item';
+        placeItem.setAttribute('data-place-id', place.place_id);
+        placeItem.innerHTML = `
+            <div class="place-info">
+                <h5 class="place-name">${place.name}</h5>
+                <p class="place-address">${address}</p>
+            </div>
+            <button type="button" class="place-record-btn" data-place-id="${place.place_id}">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                </svg>
+                <span>이곳에서 독서 기록 남기기</span>
+            </button>
+        `;
+
+        // 목록의 맨 위에 추가
+        placesList.insertBefore(placeItem, placesList.firstChild);
+
+        // 10개를 초과하면 가장 오래된 장소(맨 밑) 제거
+        const placeItems = placesList.querySelectorAll('.place-item');
+        if (placeItems.length > 10) {
+            // 가장 마지막(오래된) 장소 제거
+            const oldestPlace = Array.from(placeItems).pop(); // 마지막 요소 가져오기
+            if (oldestPlace) {
+                oldestPlace.remove();
+                console.log('ℹ️ 장소 개수가 10개를 초과하여 가장 오래된 장소를 제거했습니다.');
+            }
+        }
+
+        // '추천 장소' 탭 활성화
+        const recommendedTab = document.querySelector('.sidebar-tab-btn[data-tab="recommended"]');
+        const savedTab = document.querySelector('.sidebar-tab-btn[data-tab="saved"]');
+        const savedPlacesList = document.getElementById('saved-places-list');
+        
+        if (recommendedTab && savedTab) {
+            recommendedTab.classList.add('active');
+            savedTab.classList.remove('active');
+        }
+        
+        if (placesList) placesList.style.display = 'flex';
+        if (savedPlacesList) savedPlacesList.style.display = 'none';
+
+        // 이벤트 위임으로 이미 처리되므로 여기서는 추가 이벤트 리스너를 등록하지 않음
+        // (이벤트 위임은 DOMContentLoaded에서 이미 설정됨)
+
+        // 추가된 장소로 부드럽게 스크롤
+        setTimeout(() => {
+            placeItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            // 하이라이트 효과
+            placeItem.style.background = 'rgba(196, 201, 168, 0.3)';
+            setTimeout(() => {
+                placeItem.style.background = '';
+            }, 2000);
+        }, 100);
+
+        console.log('✅ 사이드바에 장소 추가 완료:', place.name);
+    } catch (error) {
+        console.error('❌ 사이드바에 장소 추가 오류:', error);
+    }
+}
+
+/**
+ * 기존 마커를 모두 제거하는 함수
+ */
+function clearMarkers() {
+    currentMarkers.forEach(marker => {
+        marker.setMap(null);
+    });
+    currentMarkers = [];
 }
 
 // initMap 함수를 전역 스코프에 노출 (Google Maps API 콜백용)
@@ -5559,7 +8420,6 @@ async function initSpotifyPlayer(token) {
                 // 현재 상태 정보 출력
                 console.error('현재 상태:');
                 console.error('  - Access Token 존재:', !!token);
-                console.error('  - Token 길이:', token ? token.length : 0);
                 console.error('  - SDK 로드 상태:', !!window.Spotify);
                 console.error('  - 플레이어 인스턴스:', !!spotifyPlayer);
                 console.error('  - 플레이어 이름:', spotifyPlayer?.name || '없음');
@@ -5873,10 +8733,13 @@ function getSpotifyToken() {
 }
 
 /**
- * Spotify 로그인 함수
- * 새 창에서 Spotify 로그인 페이지를 열고, 토큰을 받아 플레이어를 초기화합니다.
+ * Spotify 로그인 함수 - 제거됨
+ * 검색 기능만 사용하므로 로그인 불필요
  */
 function loginToSpotify() {
+    console.log('Spotify 로그인 기능이 비활성화되었습니다. 검색 기능만 사용 가능합니다.');
+    return;
+    /*
     console.log('========================================');
     console.log('🔄 Spotify 로그인 시작');
     console.log('========================================');
@@ -5939,7 +8802,6 @@ function loginToSpotify() {
             const { accessToken, refreshToken, expiresIn } = event.data;
             console.log('📦 수신된 토큰 정보:');
             console.log('  - Access Token 존재:', !!accessToken);
-            console.log('  - Access Token 길이:', accessToken ? accessToken.length : 0);
             console.log('  - Refresh Token 존재:', !!refreshToken);
             console.log('  - Expires In:', expiresIn);
             
@@ -6081,6 +8943,7 @@ function loginToSpotify() {
             window.spotifyLoginInProgress = false;
         }
     }, 1000);
+    */
 }
 
 /**
@@ -6169,3 +9032,589 @@ window.togglePlayback = togglePlayback;
 window.playNextTrack = playNextTrack;
 window.playPreviousTrack = playPreviousTrack;
 window.loginToSpotify = loginToSpotify;
+
+// ============================================
+// MongoDB API를 통한 챕터 로드 함수
+// ============================================
+
+/**
+ * 서버 API에서 챕터 텍스트를 가져와서 viewer에 표시하는 함수
+ * 각 단어를 <span> 태그로 감싸서 클릭 이벤트를 추가합니다.
+ * 
+ * @param {string} bookTitle - 책 제목 (예: "Pride and Prejudice")
+ * @param {number} chapterNumber - 챕터 번호 (예: 1)
+ */
+async function loadChapter(bookTitle, chapterNumber) {
+    try {
+        // viewer 요소 확인
+        const viewerElement = document.getElementById('original-text-viewer');
+        if (!viewerElement) {
+            console.error('❌ viewer 요소를 찾을 수 없습니다.');
+            return;
+        }
+
+        // 로딩 상태 표시
+        viewerElement.innerHTML = '<p style="text-align: center; color: #666;">챕터를 불러오는 중...</p>';
+
+        let data = null;
+        let textContent = null;
+        let chapterNum = chapterNumber;
+        let bookTitleText = bookTitle;
+        let author = '';
+
+        // The Great Gatsby인 경우 JSON 파일에서 직접 읽기
+        console.log(`🔍 loadChapter 호출: bookTitle="${bookTitle}", chapterNumber=${chapterNumber}`);
+        if (bookTitle === 'The Great Gatsby' || bookTitle === 'The_Great_Gatsby' || bookTitle.includes('Gatsby')) {
+            console.log('📚 The Great Gatsby 감지 - JSON 파일에서 로드 시도');
+            try {
+                // 절대 경로 사용 (서버의 정적 파일 경로)
+                const jsonUrl = window.location.origin + '/data/The_Great_Gatsby_chapters.json';
+                console.log(`📂 JSON 파일 경로: ${jsonUrl}`);
+                const jsonResponse = await fetch(jsonUrl);
+                
+                if (!jsonResponse.ok) {
+                    throw new Error(`JSON 파일을 불러올 수 없습니다. (HTTP ${jsonResponse.status})`);
+                }
+                
+                const jsonData = await jsonResponse.json();
+                console.log(`✅ JSON 파일 로드 성공: 총 ${jsonData.chapters?.length || 0}개 챕터`);
+                
+                // 해당 챕터 찾기
+                const chapter = jsonData.chapters.find(ch => ch.chapter_number === chapterNumber);
+                
+                if (!chapter) {
+                    throw new Error(`챕터 ${chapterNumber}를 찾을 수 없습니다. (사용 가능한 챕터: ${jsonData.chapters.map(ch => ch.chapter_number).join(', ')})`);
+                }
+                
+                // 데이터 구조 맞추기
+                data = {
+                    text_content: chapter.content,
+                    chapter_number: chapter.chapter_number,
+                    book_title: jsonData.book_title,
+                    author: jsonData.author
+                };
+                
+                textContent = chapter.content;
+                chapterNum = chapter.chapter_number;
+                bookTitleText = jsonData.book_title;
+                author = jsonData.author;
+                
+                console.log(`✅ The Great Gatsby 챕터 ${chapterNumber} 로드 완료 (JSON 파일에서)`);
+            } catch (jsonError) {
+                console.error('❌ JSON 파일 로드 오류:', jsonError);
+                // JSON 파일 로드 실패 시 에러를 던짐 (API로 폴백하지 않음)
+                throw new Error(`The Great Gatsby 챕터를 로드할 수 없습니다: ${jsonError.message}`);
+            }
+        } else {
+            console.log('📚 다른 책 감지 - API에서 로드 시도');
+            // 기존 API 방식 (다른 책들)
+            // API URL 생성 (bookTitle을 URL 인코딩)
+            const encodedBookTitle = encodeURIComponent(bookTitle);
+            const apiUrl = `http://localhost:11304/api/book/chapter/${encodedBookTitle}/${chapterNumber}`;
+
+            console.log(`📖 챕터 로드 시작: ${bookTitle} - Chapter ${chapterNumber}`);
+            console.log(`🔗 API URL: ${apiUrl}`);
+
+            // API 호출
+            const response = await fetch(apiUrl);
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ message: '알 수 없는 오류' }));
+                throw new Error(errorData.message || `HTTP 오류: ${response.status}`);
+            }
+
+            data = await response.json();
+
+            if (!data.text_content) {
+                throw new Error('챕터 내용이 없습니다.');
+            }
+
+            // 텍스트 내용 가져오기 (백엔드 구조에 맞게)
+            textContent = data.text_content;
+            chapterNum = data.chapter_number || chapterNumber;
+            bookTitleText = data.book_title || bookTitle;
+            author = data.author || '';
+        }
+
+        // 텍스트를 단어별로 분리하고 <span> 태그로 감싸기
+        // textContent는 위에서 이미 설정됨 (JSON 파일 또는 API 응답에서)
+        const words = textContent.split(/(\s+)/); // 공백도 함께 분리하여 보존
+
+        // 각 단어를 <span> 태그로 감싸기
+        const wrappedWords = words.map((word, index) => {
+            // 공백인 경우 그대로 반환
+            if (/^\s+$/.test(word)) {
+                return word;
+            }
+
+            // 단어인 경우 <span> 태그로 감싸기 (viewer.js와 호환성을 위해 .word 클래스 사용)
+            return `<span class="word" data-word="${word.replace(/"/g, '&quot;')}" data-index="${index}">${word}</span>`;
+        });
+
+        // 로마 숫자 변환 함수
+        function toRomanNumeral(num) {
+            if (!num || num < 1) return 'I';
+            const romanNumerals = [
+                { value: 1000, numeral: 'M' },
+                { value: 900, numeral: 'CM' },
+                { value: 500, numeral: 'D' },
+                { value: 400, numeral: 'CD' },
+                { value: 100, numeral: 'C' },
+                { value: 90, numeral: 'XC' },
+                { value: 50, numeral: 'L' },
+                { value: 40, numeral: 'XL' },
+                { value: 10, numeral: 'X' },
+                { value: 9, numeral: 'IX' },
+                { value: 5, numeral: 'V' },
+                { value: 4, numeral: 'IV' },
+                { value: 1, numeral: 'I' }
+            ];
+            let result = '';
+            for (const { value, numeral } of romanNumerals) {
+                while (num >= value) {
+                    result += numeral;
+                    num -= value;
+                }
+            }
+            return result;
+        }
+        
+        // chapterNum, bookTitleText, author는 위에서 이미 설정됨 (JSON 파일 또는 API 응답에서)
+        const chapterTitle = `Chapter ${toRomanNumeral(chapterNum)}]`;
+        
+        // HTML 생성 (viewer.js와 동일한 구조 사용)
+        const chapterHeader = `
+            <div class="chapter-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h5 class="chapter-title" style="margin: 0;">${chapterTitle} ${escapeHtml(bookTitleText)}${author ? ' - ' + escapeHtml(author) : ''}</h5>
+                <button 
+                    id="chapter-translate-btn" 
+                    class="chapter-translate-btn" 
+                    data-book-title="${escapeHtml(bookTitleText)}"
+                    data-chapter-num="${chapterNum}"
+                    style="padding: 8px 16px; background: #4a90e2; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.3s ease; display: flex; align-items: center; gap: 6px;"
+                    title="한국어 번역 보기"
+                >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 8l6 6"></path>
+                        <path d="M4 14l6-6 2-3"></path>
+                        <path d="M2 5h12"></path>
+                        <path d="M7 2h1"></path>
+                        <path d="M22 22l-5-10-5 10"></path>
+                        <path d="M14 18h6"></path>
+                    </svg>
+                    <span>한국어 번역</span>
+                </button>
+            </div>
+        `;
+        
+        // 번역 영역 추가
+        const translationSection = `
+            <div id="chapter-translation-section" style="display: none; margin-top: 20px; padding: 20px; background: #f9f9f9; border-radius: 8px; border: 1px solid #e0e0e0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <h5 style="margin: 0; color: #333; font-size: 16px;">📖 한국어 번역</h5>
+                    <button 
+                        id="close-translation-btn" 
+                        style="background: transparent; border: none; cursor: pointer; padding: 4px; color: #666; font-size: 18px;"
+                        title="번역 닫기"
+                    >
+                        ×
+                    </button>
+                </div>
+                <div id="chapter-translation-content" style="line-height: 1.8; color: #333; font-size: 15px;">
+                    <p style="text-align: center; color: #666;">번역 중...</p>
+                </div>
+            </div>
+        `;
+        
+        // 원문/번역 토글 버튼 추가
+        const viewToggleSection = `
+            <div id="chapter-view-toggle" style="display: none; margin-bottom: 12px; text-align: center;">
+                <button 
+                    id="show-original-btn" 
+                    class="view-toggle-btn active"
+                    style="padding: 8px 20px; background: #4a90e2; color: white; border: none; border-radius: 6px 0 0 6px; cursor: pointer; font-size: 14px;"
+                >
+                    원문
+                </button>
+                <button 
+                    id="show-translation-btn" 
+                    class="view-toggle-btn"
+                    style="padding: 8px 20px; background: #e0e0e0; color: #666; border: none; border-radius: 0 6px 6px 0; cursor: pointer; font-size: 14px; margin-left: -1px;"
+                >
+                    번역
+                </button>
+            </div>
+        `;
+        
+        const htmlContent = chapterHeader + viewToggleSection + '<div id="chapter-original-text" class="chapter-text">' + wrappedWords.join(' ') + '</div>' + translationSection;
+
+        // viewer에 내용 삽입
+        viewerElement.innerHTML = htmlContent;
+        
+        // 번역 버튼 이벤트 리스너 추가
+        const translateBtn = viewerElement.querySelector('#chapter-translate-btn');
+        if (translateBtn) {
+            translateBtn.addEventListener('click', async function() {
+                if (typeof window.translateCurrentChapter === 'function') {
+                    await window.translateCurrentChapter(bookTitleText, chapterNum, textContent);
+                } else {
+                    console.error('translateCurrentChapter 함수를 찾을 수 없습니다.');
+                }
+            });
+        }
+        
+        // 번역 닫기 버튼 이벤트 리스너
+        const closeTranslationBtn = viewerElement.querySelector('#close-translation-btn');
+        if (closeTranslationBtn) {
+            closeTranslationBtn.addEventListener('click', function() {
+                const translationSection = viewerElement.querySelector('#chapter-translation-section');
+                const viewToggle = viewerElement.querySelector('#chapter-view-toggle');
+                if (translationSection) translationSection.style.display = 'none';
+                if (viewToggle) viewToggle.style.display = 'none';
+                const originalText = viewerElement.querySelector('#chapter-original-text');
+                if (originalText) originalText.style.display = 'block';
+            });
+        }
+        
+        // 원문/번역 토글 버튼 이벤트 리스너
+        const showOriginalBtn = viewerElement.querySelector('#show-original-btn');
+        const showTranslationBtn = viewerElement.querySelector('#show-translation-btn');
+        
+        if (showOriginalBtn) {
+            showOriginalBtn.addEventListener('click', function() {
+                const originalText = viewerElement.querySelector('#chapter-original-text');
+                const translationSection = viewerElement.querySelector('#chapter-translation-section');
+                if (originalText) originalText.style.display = 'block';
+                if (translationSection) translationSection.style.display = 'none';
+                this.style.background = '#4a90e2';
+                this.style.color = 'white';
+                if (showTranslationBtn) {
+                    showTranslationBtn.style.background = '#e0e0e0';
+                    showTranslationBtn.style.color = '#666';
+                }
+            });
+        }
+        
+        if (showTranslationBtn) {
+            showTranslationBtn.addEventListener('click', function() {
+                const originalText = viewerElement.querySelector('#chapter-original-text');
+                const translationSection = viewerElement.querySelector('#chapter-translation-section');
+                if (originalText) originalText.style.display = 'none';
+                if (translationSection) translationSection.style.display = 'block';
+                this.style.background = '#4a90e2';
+                this.style.color = 'white';
+                if (showOriginalBtn) {
+                    showOriginalBtn.style.background = '#e0e0e0';
+                    showOriginalBtn.style.color = '#666';
+                }
+            });
+        }
+
+        // 각 단어에 클릭 이벤트는 viewer.js의 이벤트 위임으로 처리됩니다.
+        // (viewer.js의 이벤트 리스너가 이미 등록되어 있음)
+        
+        // DOM이 완전히 렌더링된 후 확인
+        setTimeout(() => {
+            const wordSpans = viewerElement.querySelectorAll('.word');
+            console.log(`✅ 챕터 표시 완료: ${wordSpans.length}개의 단어가 클릭 가능합니다.`);
+            console.log('🔍 DOM 구조 확인:', {
+                viewerElement: !!viewerElement,
+                chapterTextDiv: !!viewerElement.querySelector('.chapter-text'),
+                wordElements: wordSpans.length,
+                firstWord: wordSpans[0] ? wordSpans[0].textContent : 'none'
+            });
+        }, 0);
+
+    } catch (error) {
+        console.error('❌ 챕터 로드 오류:', error);
+        
+        const viewerElement = document.getElementById('original-text-viewer');
+        if (viewerElement) {
+            viewerElement.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #d32f2f;">
+                    <p style="font-size: 1.1rem; margin-bottom: 10px;">⚠️ 챕터를 불러올 수 없습니다</p>
+                    <p style="color: #666; font-size: 0.9rem;">${error.message}</p>
+                </div>
+            `;
+        }
+    }
+}
+
+// 전역 스코프에 함수 노출
+window.loadChapter = loadChapter;
+
+// ============================================
+// 독서 기록 관리 기능
+// ============================================
+
+/**
+ * 독서 기록을 저장하는 함수
+ * @param {string} placeName - 장소 이름
+ * @param {string} placeAddress - 장소 주소
+ * @param {string} bookTitle - 책 제목 (선택)
+ */
+function saveReadingRecord(placeName, placeAddress, bookTitle = '') {
+    try {
+        // localStorage에서 기존 기록 가져오기
+        const records = JSON.parse(localStorage.getItem('readingRecords') || '[]');
+        
+        // 새 기록 생성
+        const newRecord = {
+            id: Date.now().toString(),
+            placeName: placeName,
+            placeAddress: placeAddress,
+            bookTitle: bookTitle || '책 정보 없음',
+            date: new Date().toISOString(),
+            formattedDate: formatDate(new Date())
+        };
+        
+        // 맨 앞에 추가 (최신 기록이 위에 오도록)
+        records.unshift(newRecord);
+        
+        // localStorage에 저장
+        localStorage.setItem('readingRecords', JSON.stringify(records));
+        
+        console.log('✅ 독서 기록 저장 완료:', newRecord);
+        alert(`"${placeName}"에서 독서 기록이 저장되었습니다!`);
+        
+        // 마이페이지가 표시 중이면 기록 목록 업데이트
+        if (document.getElementById('mypage-page')?.style.display !== 'none') {
+            loadReadingRecords();
+        }
+    } catch (error) {
+        console.error('❌ 독서 기록 저장 오류:', error);
+        alert('독서 기록 저장 중 오류가 발생했습니다.');
+    }
+}
+
+/**
+ * 날짜를 포맷팅하는 함수
+ * @param {Date} date - 날짜 객체
+ * @returns {string} - 포맷된 날짜 문자열
+ */
+function formatDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}년 ${month}월 ${day}일`;
+}
+
+/**
+ * 마이페이지에 독서 기록을 표시하는 함수
+ * 최대 3개까지만 표시하고, 3개 이상이면 더보기 버튼 활성화
+ */
+function loadReadingRecords() {
+    try {
+        const records = JSON.parse(localStorage.getItem('readingRecords') || '[]');
+        const placesList = document.querySelector('.reading-places-list');
+        const moreBtn = document.querySelector('.mypage-places .section-toggle-btn');
+        
+        if (!placesList) {
+            console.warn('⚠️ 독서 기록 목록 요소를 찾을 수 없습니다.');
+            return;
+        }
+        
+        // 기존 내용 제거
+        placesList.innerHTML = '';
+        
+        if (records.length === 0) {
+            placesList.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">독서 기록이 없습니다.</p>';
+            if (moreBtn) moreBtn.style.display = 'none';
+            return;
+        }
+        
+        // 최대 3개까지만 표시
+        const displayRecords = records.slice(0, 3);
+        const hasMore = records.length > 3;
+        
+        // 기록 표시
+        displayRecords.forEach(record => {
+            const recordItem = document.createElement('div');
+            recordItem.className = 'reading-place-item';
+            recordItem.setAttribute('data-record-id', record.id);
+            recordItem.innerHTML = `
+                <div class="place-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                </div>
+                <div class="place-details">
+                    <h5 class="place-name">${escapeHtml(record.placeName)}</h5>
+                    <p class="place-date">${record.formattedDate}</p>
+                    <p class="place-book">${escapeHtml(record.bookTitle)}</p>
+                </div>
+            `;
+            placesList.appendChild(recordItem);
+        });
+        
+        // 더보기 버튼 표시/숨김
+        if (moreBtn) {
+            if (hasMore) {
+                moreBtn.style.display = 'block';
+                moreBtn.textContent = '더보기';
+            } else {
+                moreBtn.style.display = 'none';
+            }
+        }
+        
+        console.log(`✅ 독서 기록 표시 완료: ${displayRecords.length}개 (전체 ${records.length}개)`);
+    } catch (error) {
+        console.error('❌ 독서 기록 불러오기 오류:', error);
+    }
+}
+
+/**
+ * 더보기 버튼 클릭 시 모달 창을 여는 함수
+ */
+function openReadingRecordsModal() {
+    try {
+        const records = JSON.parse(localStorage.getItem('readingRecords') || '[]');
+        
+        // 모달 HTML 생성
+        const modalHTML = `
+            <div id="reading-records-modal" class="reading-records-modal" style="display: flex;">
+                <div class="modal-overlay"></div>
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>독서한 장소 기록</h3>
+                        <button type="button" class="modal-close-btn" aria-label="닫기">×</button>
+                    </div>
+                    <div class="modal-body">
+                        ${records.length === 0 
+                            ? '<p style="text-align: center; color: #666; padding: 40px;">독서 기록이 없습니다.</p>'
+                            : records.map(record => `
+                                <div class="modal-record-item" data-record-id="${record.id}">
+                                    <div class="modal-record-icon">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                            <circle cx="12" cy="10" r="3"></circle>
+                                        </svg>
+                                    </div>
+                                    <div class="modal-record-details">
+                                        <h5>${escapeHtml(record.placeName)}</h5>
+                                        <p class="modal-record-address">${escapeHtml(record.placeAddress)}</p>
+                                        <p class="modal-record-date">${record.formattedDate}</p>
+                                        <p class="modal-record-book">${escapeHtml(record.bookTitle)}</p>
+                                    </div>
+                                    <button type="button" class="modal-delete-btn" data-record-id="${record.id}" aria-label="삭제">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            `).join('')
+                        }
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // 기존 모달이 있으면 제거
+        const existingModal = document.getElementById('reading-records-modal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+        
+        // 모달 추가
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        
+        // 모달 닫기 버튼 이벤트
+        const modal = document.getElementById('reading-records-modal');
+        const closeBtn = modal.querySelector('.modal-close-btn');
+        const overlay = modal.querySelector('.modal-overlay');
+        
+        const closeModal = () => {
+            modal.remove();
+        };
+        
+        closeBtn.addEventListener('click', closeModal);
+        overlay.addEventListener('click', closeModal);
+        
+        // ESC 키로 닫기
+        const handleEsc = (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+                document.removeEventListener('keydown', handleEsc);
+            }
+        };
+        document.addEventListener('keydown', handleEsc);
+        
+        // 삭제 버튼 이벤트
+        const deleteButtons = modal.querySelectorAll('.modal-delete-btn');
+        deleteButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const recordId = this.getAttribute('data-record-id');
+                deleteReadingRecord(recordId);
+            });
+        });
+        
+    } catch (error) {
+        console.error('❌ 모달 열기 오류:', error);
+    }
+}
+
+/**
+ * 독서 기록을 삭제하는 함수
+ * @param {string} recordId - 기록 ID
+ */
+function deleteReadingRecord(recordId) {
+    if (!confirm('이 독서 기록을 삭제하시겠습니까?')) {
+        return;
+    }
+    
+    try {
+        const records = JSON.parse(localStorage.getItem('readingRecords') || '[]');
+        const filteredRecords = records.filter(r => r.id !== recordId);
+        localStorage.setItem('readingRecords', JSON.stringify(filteredRecords));
+        
+        console.log('✅ 독서 기록 삭제 완료:', recordId);
+        
+        // 모달과 마이페이지 모두 업데이트
+        const modal = document.getElementById('reading-records-modal');
+        if (modal) {
+            // 모달이 열려있으면 다시 열기 (업데이트된 목록으로)
+            openReadingRecordsModal();
+        }
+        
+        // 마이페이지 업데이트
+        loadReadingRecords();
+        
+        alert('독서 기록이 삭제되었습니다.');
+    } catch (error) {
+        console.error('❌ 독서 기록 삭제 오류:', error);
+        alert('독서 기록 삭제 중 오류가 발생했습니다.');
+    }
+}
+
+// 더보기 버튼 이벤트 리스너
+document.addEventListener('DOMContentLoaded', function() {
+    // 더보기 버튼 클릭 이벤트
+    const moreBtn = document.querySelector('.mypage-places .section-toggle-btn');
+    if (moreBtn) {
+        moreBtn.addEventListener('click', openReadingRecordsModal);
+    }
+    
+    // 마이페이지 표시 시 기록 불러오기
+    const mypagePage = document.getElementById('mypage-page');
+    if (mypagePage) {
+        // 페이지 전환 감지를 위한 MutationObserver 또는 showPage 함수 수정
+        // 일단 초기 로드 시 한 번 불러오기
+        loadReadingRecords();
+    }
+});
+
+
+// 전역 스코프에 함수 노출
+window.saveReadingRecord = saveReadingRecord;
+window.loadReadingRecords = loadReadingRecords;
+window.openReadingRecordsModal = openReadingRecordsModal;
+window.deleteReadingRecord = deleteReadingRecord;
+
+// 페이지를 떠날 때 Socket 연결 해제
+window.addEventListener('beforeunload', () => {
+    if (socket) {
+        socket.disconnect();
+    }
+});
